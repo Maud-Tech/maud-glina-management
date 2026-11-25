@@ -26,9 +26,10 @@ Camadas, de baixo para cima. Um módulo **só importa módulos abaixo dele** e *
 | # | Pasta | Responsável por |
 |---|---|---|
 | 1 | `shared/` | Núcleo: Money, Shares, clock, erros, idempotência, outbox, proteções de banco |
-| 2 | `modules/example/` | **Demonstração** (não é negócio): a forma de um módulo e das slices de referência. Apagar quando existir um módulo real |
-| 3 | `integration/` | Bordas: adapters de parceiros e entrega do outbox (webhook) |
-| 4 | `jobs/`, `config/` | Entrypoints: Worker (agenda) e API/URLs |
+| 2 | `modules/entities/` | Cadastro mestre de pessoas físicas e jurídicas, países, moedas, endereços e contatos |
+| 3 | `modules/example/` | **Demonstração** (não é negócio): a forma de um módulo e das slices de referência. Apagar quando existir um módulo real |
+| 4 | `integration/` | Bordas: adapters de parceiros e entrega do outbox (webhook) |
+| 5 | `jobs/`, `config/` | Entrypoints: Worker (agenda) e API/URLs |
 
 Módulo novo entra nesta tabela, entre `shared/` e `integration/`, na ordem de dependência (skill `new-module`).
 

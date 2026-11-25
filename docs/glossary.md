@@ -4,14 +4,14 @@ Fonte única dos termos. **Todo nome no código é em inglês** (arquivos, class
 
 ## Termos do negócio
 
-Os nomes em inglês ainda **não foram escolhidos**: escolha com o time e preencha a coluna "Código" antes de criar o primeiro módulo. As definições abaixo são só o que o desenho da arquitetura diz.
+Os termos já implementados têm nome em inglês definido. Os demais permanecem a definir com o time antes de entrarem no código.
 
 | Português (negócio) | Código | Definição |
 |---|---|---|
 | App de gestão | este app (`maud-glina-management`) | Sabe o que existe e quanto vale. Não conhece cliente. |
 | Apólice | _a definir_ | Tem fechamento por data e versão, e um total conferido. |
 | Conta corrente | _a definir_ | _a definir com o time_ |
-| Ativo | _a definir_ | _a definir com o time_ |
+| Ativo | `Asset` | Identidade central de qualquer ativo offshore. |
 | Movimento | _a definir_ | _a definir com o time_ |
 | Posição | _a definir_ | Conferida com a custódia. |
 | Preço | _a definir_ | Ingerido pelo Worker. |
@@ -23,6 +23,13 @@ Os nomes em inglês ainda **não foram escolhidos**: escolha com o time e preenc
 | Preliminar / oficial / retificado | _a definir_ | Status do fechamento. Preliminar tem pendências nomeadas; retificado é versão nova, com motivo e delta. |
 | Pendência | _a definir_ | Informação que falta num fechamento preliminar. Tem nome. |
 | Total conferido | _a definir_ | Total da apólice que bateu com a custódia. Só o que bateu conta. |
+| Moeda | `Currency` | Moeda disponível para países e futuros ativos, identificada pelo código ISO 4217. |
+| País | `Country` | País identificado pelo código ISO 3166-1 alpha-2 e sua moeda principal. |
+| Entidade | `Entity` | Identidade central de uma pessoa física ou jurídica, referenciada pelos demais módulos. |
+| Pessoa física | `EntityPerson` | Detalhes exclusivos de uma entidade cuja natureza é `PERSON`. |
+| Pessoa jurídica | `EntityCompany` | Detalhes exclusivos de uma entidade cuja natureza é `COMPANY`. |
+| Endereço da entidade | `EntityAddress` | Endereço internacional associado a uma entidade. |
+| Contato da entidade | `EntityContact` | E-mail ou telefone associado a uma entidade. |
 | Item | `Item` | Registro do módulo de demonstração `example`. Apague quando o módulo sair. |
 
 ## Termos da arquitetura (vêm do boilerplate)

@@ -15,6 +15,12 @@ Modelo:
 
 ---
 
+## 2026-11-26 · entities · modelo cadastral de pessoas e empresas
+- **O que mudou:** criado o módulo `entities` com moedas, países, identidade central, detalhes de pessoa física e jurídica, endereços e contatos.
+- **Por quê:** estabelecer o cadastro mestre referenciado pelo módulo de ativos do app de gestão.
+- **Pendente / atenção:** slices, endpoints, telas e migrations definitivas serão criados depois.
+- **Autor:** Felipe Linhares (+ IA)
+
 ## 2026-11-26 · projeto · app de gestão da arquitetura Glina
 - **O que mudou:** repositório criado a partir do `maud-boilerplate` como o "App de gestão" do desenho da arquitetura Glina. Nome, banco (`maud_glina_management`) e portas próprias (API 8002, Postgres 5435); `docs/context.md`, glossário e README escritos a partir do desenho. Nenhum módulo de negócio ainda.
 - **Por quê:** a arquitetura fechada com o time tem três repositórios (porteiro, app de passivo, app de gestão). A gestão é separada do passivo desde o começo porque pode ser vendida sozinha ([ADR 0008](adr/0008-management-app.md)).
