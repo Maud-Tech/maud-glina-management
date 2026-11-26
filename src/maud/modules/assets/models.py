@@ -436,7 +436,6 @@ class GenericAsset(TimestampedModel):
         related_name="generic_details",
     )
     generic_type = models.CharField(max_length=100, blank=True, default="")
-    original_code = models.CharField(max_length=100)
     raw_data = models.JSONField(default=dict)
     normalization_status = models.CharField(
         max_length=20,

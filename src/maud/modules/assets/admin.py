@@ -84,8 +84,8 @@ class FundAdmin(ReadOnlyAdmin):
 
 @admin.register(GenericAsset)
 class GenericAssetAdmin(ReadOnlyAdmin):
-    list_display = ("asset", "original_code", "normalization_status")
-    search_fields = ("asset__name", "original_code")
+    list_display = ("asset", "normalization_status")
+    search_fields = ("asset__name",)
     list_filter = ("normalization_status",)
 
 

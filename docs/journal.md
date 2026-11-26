@@ -15,6 +15,12 @@ Modelo:
 
 ---
 
+## 2026-11-26 · assets · ativo genérico sem código de origem
+- **O que mudou:** removido `original_code` do ativo genérico.
+- **Por quê:** sem uma origem associada, o código externo ficaria ambíguo entre fornecedores.
+- **Pendente / atenção:** `raw_data` permanece para preservar o conteúdo recebido durante a normalização.
+- **Autor:** Felipe Linhares (+ IA)
+
 ## 2026-11-26 · assets · cadastro de fundos simplificado
 - **O que mudou:** removidos início, término, frequência de negociação e lockup do cadastro de fundo; o vínculo com o fundo pai foi preservado.
 - **Por quê:** manter no cadastro mestre somente dados próprios do veículo e deixar regras operacionais para aplicação e resgate.
