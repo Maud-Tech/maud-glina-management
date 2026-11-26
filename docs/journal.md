@@ -15,6 +15,12 @@ Modelo:
 
 ---
 
+## 2026-11-26 · projeto · whitenoise serve os arquivos estáticos
+- **O que mudou:** o `whitenoise` (middleware logo depois do `SecurityMiddleware`) serve o `staticfiles/` que o `collectstatic` gera no build, comprimido. O admin abre com CSS em produção, sem nginx.
+- **Por quê:** o gunicorn não serve arquivo estático.
+- **Pendente / atenção:** armazenamento `CompressedStaticFilesStorage`, sem manifesto (o com manifesto quebra página que usa `{% static %}` quando o `collectstatic` não rodou, como nos testes).
+- **Autor:** Walter (+ IA)
+
 ## 2026-11-26 · projeto · build leva as migrations e roda migrate e collectstatic
 - **O que mudou:** a imagem leva as migrations da pasta do projeto (fora do git) e o build falha se algum model mudou sem migration gerada. O `collectstatic` roda no build. Novo serviço `migrate` no `docker-compose.yml`, que aplica as migrations antes da API e do Worker. Novo `.dockerignore`: `.env`, `.git` e `.venv` não entram mais na imagem.
 - **Por quê:** cada ambiente tem o próprio banco e as próprias migrations; a imagem precisa levar exatamente as da pasta de quem faz o build, para o histórico do banco não se perder quando um model muda.
