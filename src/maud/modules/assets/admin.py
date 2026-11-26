@@ -71,8 +71,8 @@ class EquityAdmin(ReadOnlyAdmin):
 
 @admin.register(DebtInstrument)
 class DebtInstrumentAdmin(ReadOnlyAdmin):
-    list_display = ("asset", "instrument_type", "debt_type", "maturity_date", "defaulted")
-    list_filter = ("instrument_type", "debt_type", "perpetual", "defaulted")
+    list_display = ("asset", "instrument_type", "debt_type", "maturity_date")
+    list_filter = ("instrument_type", "debt_type", "perpetual")
 
 
 @admin.register(Fund)

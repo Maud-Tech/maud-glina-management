@@ -16,7 +16,7 @@ Modelo:
 ---
 
 ## 2026-11-26 · assets · cadastro de dívida simplificado
-- **O que mudou:** removidos valor de face original, frequência de cupom e spread em pontos-base do cadastro de dívida.
+- **O que mudou:** removidos valor de face original, frequência de cupom, spread, indicador de default e valores de emissão e resgate do cadastro de dívida.
 - **Por quê:** manter no MVP somente os dados necessários ao uso atual dos instrumentos.
 - **Pendente / atenção:** cálculos futuros usarão o padrão fixo de accrual em 252 dias úteis, sem configuração por instrumento.
 - **Autor:** Felipe Linhares (+ IA)

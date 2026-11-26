@@ -326,9 +326,6 @@ class DebtInstrument(TimestampedModel):
     callable = models.BooleanField(default=False)
     putable = models.BooleanField(default=False)
     convertible = models.BooleanField(default=False)
-    defaulted = models.BooleanField(default=False)
-    issue_price = models.DecimalField(max_digits=20, decimal_places=8, null=True, blank=True)
-    redemption_value = models.DecimalField(max_digits=20, decimal_places=8, null=True, blank=True)
 
     class Meta:
         constraints = [
