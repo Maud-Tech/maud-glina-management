@@ -278,15 +278,6 @@ class DebtInstrument(TimestampedModel):
         CONDITIONAL = "CONDITIONAL", "Condicional"
         NONE = "NONE", "Nenhum"
 
-    class CouponFrequency(models.TextChoices):
-        MONTHLY = "MONTHLY", "Mensal"
-        QUARTERLY = "QUARTERLY", "Trimestral"
-        SEMIANNUAL = "SEMIANNUAL", "Semestral"
-        ANNUAL = "ANNUAL", "Anual"
-        AT_MATURITY = "AT_MATURITY", "No vencimento"
-        IRREGULAR = "IRREGULAR", "Irregular"
-        NONE = "NONE", "Nenhuma"
-
     class Seniority(models.TextChoices):
         SENIOR_SECURED = "SENIOR_SECURED", "Sênior garantida"
         SENIOR_UNSECURED = "SENIOR_UNSECURED", "Sênior sem garantia"
@@ -320,18 +311,10 @@ class DebtInstrument(TimestampedModel):
     )
     issue_date = models.DateField(null=True, blank=True)
     maturity_date = models.DateField(null=True, blank=True)
-    original_face_value = models.DecimalField(max_digits=20, decimal_places=2)
     minimum_lot = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
     coupon_type = models.CharField(max_length=30, choices=CouponType.choices)
     coupon_rate = models.DecimalField(max_digits=18, decimal_places=8, null=True, blank=True)
-    coupon_frequency = models.CharField(
-        max_length=20,
-        choices=CouponFrequency.choices,
-        blank=True,
-        default="",
-    )
     reference_rate = models.CharField(max_length=30, blank=True, default="")
-    spread_bps = models.DecimalField(max_digits=18, decimal_places=8, null=True, blank=True)
     day_count_convention = models.CharField(max_length=20, blank=True, default="")
     seniority = models.CharField(
         max_length=30,
@@ -350,10 +333,6 @@ class DebtInstrument(TimestampedModel):
 
     class Meta:
         constraints = [
-            models.CheckConstraint(
-                condition=Q(original_face_value__gt=0),
-                name="ck_debt_face_value_positive",
-            ),
             models.CheckConstraint(
                 condition=Q(minimum_lot__isnull=True) | Q(minimum_lot__gt=0),
                 name="ck_debt_minimum_lot_positive",

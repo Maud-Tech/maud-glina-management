@@ -13,7 +13,7 @@ Depende de: `entities` para moedas, países e entidades que exercem papéis no c
 - Um ticker pertence a uma `AssetListing` e é único dentro da casa de negociação.
 - Uma moeda possui no máximo um `CashAsset`; seu ativo usa a mesma moeda.
 - Identificadores externos são únicos pela combinação de tipo e valor.
-- Instrumento não perpétuo possui vencimento posterior à emissão; valores nominais são positivos.
+- Instrumento não perpétuo possui vencimento posterior à emissão; lote mínimo, quando informado, é positivo.
 - Cada classe de cotas de fundo é um ativo independente.
 - Preço é único por ativo, data, tipo e fonte.
 - Evento é único por ativo, tipo, Data COM e liquidação; `cum_price` é o Preço COM.

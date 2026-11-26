@@ -144,7 +144,6 @@ def test_nonperpetual_debt_requires_maturity(asset: Asset) -> None:
             asset=asset,
             instrument_type=DebtInstrument.InstrumentType.BOND,
             debt_type=DebtInstrument.DebtType.CORPORATE,
-            original_face_value=Decimal("1000.00"),
             coupon_type=DebtInstrument.CouponType.FIXED,
             perpetual=False,
         )
@@ -161,7 +160,6 @@ def test_maturity_must_be_after_issue_date(asset: Asset) -> None:
             debt_type=DebtInstrument.DebtType.CORPORATE,
             issue_date=date(2026, 1, 2),
             maturity_date=date(2026, 1, 1),
-            original_face_value=Decimal("1000.00"),
             coupon_type=DebtInstrument.CouponType.FIXED,
         )
 

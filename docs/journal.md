@@ -15,6 +15,12 @@ Modelo:
 
 ---
 
+## 2026-11-26 · assets · cadastro de dívida simplificado
+- **O que mudou:** removidos valor de face original, frequência de cupom e spread em pontos-base do cadastro de dívida.
+- **Por quê:** manter no MVP somente os dados necessários ao uso atual dos instrumentos.
+- **Pendente / atenção:** a convenção de contagem de dias foi mantida para eventual cálculo de juros corridos.
+- **Autor:** Felipe Linhares (+ IA)
+
 ## 2026-11-26 · assets · tipos de preço do MVP
 - **O que mudou:** preços passaram a aceitar somente `MKT`, `MD` e `CURVE`; o horário intradiário `as_of` foi removido.
 - **Por quê:** representar preço de mercado, última cotação disponível sem média ANBIMA e preço de curva para dívida sem marcação.
