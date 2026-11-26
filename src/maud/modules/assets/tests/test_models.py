@@ -1,5 +1,6 @@
 from datetime import date
 from decimal import Decimal
+from typing import Any
 
 import pytest
 from django.apps import apps
@@ -21,19 +22,19 @@ pytestmark = pytest.mark.django_db
 
 
 @pytest.fixture
-def usd():  # type: ignore[no-untyped-def]
+def usd() -> Any:
     currency_model = apps.get_model("entities", "Currency")
     return currency_model.objects.create(code="USD", name="US Dollar", symbol="US$")
 
 
 @pytest.fixture
-def united_states(usd):  # type: ignore[no-untyped-def]
+def united_states(usd: Any) -> Any:
     country_model = apps.get_model("entities", "Country")
     return country_model.objects.create(code="US", name="United States", currency=usd)
 
 
 @pytest.fixture
-def asset(usd) -> Asset:  # type: ignore[no-untyped-def]
+def asset(usd: Any) -> Asset:
     return Asset.objects.create(
         asset_family=Asset.Family.EQUITY,
         name="Example Asset",
@@ -45,7 +46,7 @@ def asset(usd) -> Asset:  # type: ignore[no-untyped-def]
 
 
 @pytest.fixture
-def venue(united_states) -> TradingVenue:  # type: ignore[no-untyped-def]
+def venue(united_states: Any) -> TradingVenue:
     return TradingVenue.objects.create(
         code="NASDAQ",
         name="Nasdaq Stock Market",
@@ -56,8 +57,8 @@ def venue(united_states) -> TradingVenue:  # type: ignore[no-untyped-def]
 def test_asset_can_have_listings_on_multiple_venues(
     asset: Asset,
     venue: TradingVenue,
-    united_states,
-) -> None:  # type: ignore[no-untyped-def]
+    united_states: Any,
+) -> None:
     second_venue = TradingVenue.objects.create(
         code="NYSE",
         name="New York Stock Exchange",
@@ -72,8 +73,8 @@ def test_asset_can_have_listings_on_multiple_venues(
 def test_ticker_is_unique_inside_trading_venue(
     asset: Asset,
     venue: TradingVenue,
-    usd,
-) -> None:  # type: ignore[no-untyped-def]
+    usd: Any,
+) -> None:
     AssetListing.objects.create(asset=asset, trading_venue=venue, ticker="EXM")
     second_asset = Asset.objects.create(
         asset_family=Asset.Family.EQUITY,
@@ -92,7 +93,7 @@ def test_ticker_is_unique_inside_trading_venue(
         )
 
 
-def test_identifier_type_and_value_are_globally_unique(asset: Asset, usd) -> None:  # type: ignore[no-untyped-def]
+def test_identifier_type_and_value_are_globally_unique(asset: Asset, usd: Any) -> None:
     AssetIdentifier.objects.create(
         asset=asset,
         identifier_type=AssetIdentifier.Type.ISIN,
@@ -115,7 +116,7 @@ def test_identifier_type_and_value_are_globally_unique(asset: Asset, usd) -> Non
         )
 
 
-def test_only_one_cash_asset_exists_for_each_currency(usd) -> None:  # type: ignore[no-untyped-def]
+def test_only_one_cash_asset_exists_for_each_currency(usd: Any) -> None:
     first_asset = Asset.objects.create(
         asset_family=Asset.Family.CASH,
         name="US Dollar",
@@ -183,7 +184,7 @@ def test_normalized_generic_asset_requires_destination(asset: Asset) -> None:
         )
 
 
-def test_price_is_unique_by_asset_date_type_and_source(asset: Asset, usd) -> None:  # type: ignore[no-untyped-def]
+def test_price_is_unique_by_asset_date_type_and_source(asset: Asset, usd: Any) -> None:
     source = PriceSource.objects.create(code="MANUAL", name="Manual", priority=1)
     price = {
         "asset": asset,
