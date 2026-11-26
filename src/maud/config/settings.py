@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     # Módulos, de baixo para cima (mesma ordem das camadas do import-linter).
     "maud.shared",
     "maud.modules.entities",
+    "maud.modules.assets",
     "maud.modules.example",
     "maud.jobs",
 ]

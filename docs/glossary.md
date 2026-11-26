@@ -30,6 +30,20 @@ Os termos já implementados têm nome em inglês definido. Os demais permanecem 
 | Pessoa jurídica | `EntityCompany` | Detalhes exclusivos de uma entidade cuja natureza é `COMPANY`. |
 | Endereço da entidade | `EntityAddress` | Endereço internacional associado a uma entidade. |
 | Contato da entidade | `EntityContact` | E-mail ou telefone associado a uma entidade. |
+| Ativo | `Asset` | Identidade central de qualquer ativo offshore. |
+| Casa de negociação | `TradingVenue` | Mercado ou bolsa em que um ativo pode possuir uma listagem. |
+| Listagem do ativo | `AssetListing` | Ticker de um ativo em uma casa de negociação específica. |
+| Identificador do ativo | `AssetIdentifier` | Código externo ou interno, como ISIN, CUSIP, SEDOL ou FIGI. |
+| Caixa | `CashAsset` | Moeda representada como ativo único e compartilhado. |
+| Renda variável | `Equity` | Ação, recibo ou unidade negociável vinculada a um ativo. |
+| Instrumento de dívida | `DebtInstrument` | Bond, note ou outro instrumento que representa uma dívida. |
+| Nota estruturada | `StructuredNoteTerms` | Termos adicionais de um instrumento de dívida estruturado. |
+| Fundo | `Fund` | Classe de cotas negociável cadastrada como ativo independente. |
+| Ativo genérico | `GenericAsset` | Ativo temporário ainda não normalizado para uma família definitiva. |
+| Classificação do ativo | `AssetClassification` | Classe estratégica, subclasse, risco e liquidez de um ativo. |
+| Fonte de preço | `PriceSource` | Origem de uma observação de preço. |
+| Preço do ativo | `AssetPrice` | Preço de um ativo em uma data, tipo e fonte. |
+| Evento do ativo | `AssetEvent` | Evento econômico ou societário associado a um ativo. |
 | Item | `Item` | Registro do módulo de demonstração `example`. Apague quando o módulo sair. |
 
 ## Termos da arquitetura (vêm do boilerplate)

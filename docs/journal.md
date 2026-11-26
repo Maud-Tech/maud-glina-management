@@ -15,6 +15,12 @@ Modelo:
 
 ---
 
+## 2026-11-26 · assets · modelo cadastral de ativos offshore
+- **O que mudou:** criado o módulo `assets` com identidade, listagens, identificadores, detalhes por família, classificação, preços, eventos e termos de notas estruturadas.
+- **Por quê:** estabelecer o cadastro mestre de ativos que será usado posteriormente por operações, posições e custódia.
+- **Pendente / atenção:** slices, endpoints, telas e migrations definitivas serão criados depois; regras que cruzam tabelas serão aplicadas nelas.
+- **Autor:** Felipe Linhares (+ IA)
+
 ## 2026-11-26 · entities · modelo cadastral de pessoas e empresas
 - **O que mudou:** criado o módulo `entities` com moedas, países, identidade central, detalhes de pessoa física e jurídica, endereços e contatos.
 - **Por quê:** estabelecer o cadastro mestre referenciado pelo módulo de ativos do app de gestão.
