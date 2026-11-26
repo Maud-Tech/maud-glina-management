@@ -1,0 +1,11 @@
+# O que NÃO entra na imagem. As migrations da pasta do projeto ENTRAM (não estão no git,
+# mas precisam ir com o container: ADR "Migrations fora do git"). Não ignore migrations/ aqui.
+.git/
+.venv/
+.env
+.cache/
+__pycache__/
+*.py[cod]
+logs/
+*.log
+staticfiles/

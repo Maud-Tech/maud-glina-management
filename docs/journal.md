@@ -15,6 +15,12 @@ Modelo:
 
 ---
 
+## 2026-11-26 · projeto · build leva as migrations e roda migrate e collectstatic
+- **O que mudou:** a imagem leva as migrations da pasta do projeto (fora do git) e o build falha se algum model mudou sem migration gerada. O `collectstatic` roda no build. Novo serviço `migrate` no `docker-compose.yml`, que aplica as migrations antes da API e do Worker. Novo `.dockerignore`: `.env`, `.git` e `.venv` não entram mais na imagem.
+- **Por quê:** cada ambiente tem o próprio banco e as próprias migrations; a imagem precisa levar exatamente as da pasta de quem faz o build, para o histórico do banco não se perder quando um model muda.
+- **Pendente / atenção:** no servidor, o build é sempre na mesma pasta (clone novo não tem as migrations já aplicadas no banco de lá). O admin em produção precisa de quem sirva o `staticfiles/` (gunicorn não serve). Build não testado na máquina de quem entregou (sem Docker).
+- **Autor:** Walter (+ IA)
+
 ## 2026-11-26 · projeto · migrations fora do git
 - **O que mudou:** migration não vai mais para o git. O `.gitignore` ignora os arquivos de `migrations/` (menos o `__init__.py`); o hook `pre-commit`, o `scripts/check.py` e o CI recusam migration; as que estavam no repositório saíram do git. Os testes montam as tabelas direto dos models. A proteção dos ledgers saiu da migration 0002 e passou para o `post_migrate`, com `@append_only` no model. O hook `pre-push` ganhou permissão de execução (sem ela o git o ignorava).
 - **Por quê:** combinado do time: migration nunca sobe, e o agente nunca roda `makemigrations` nem `migrate` ([ADR 0009](adr/0009-migrations-out-of-git.md)).

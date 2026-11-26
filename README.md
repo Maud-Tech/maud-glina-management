@@ -56,6 +56,8 @@ uv run python manage.py worker           # Worker (outro terminal)
 
 Tudo em containers: `docker compose up --build` (API na porta 8002).
 
+**Build e migrations.** Migration não vai para o git, mas vai na imagem: o build copia as que estão na pasta do projeto e falha se algum model mudou sem migration gerada. Antes do build, gere na sua máquina (`uv run python manage.py makemigrations`). O serviço `migrate` aplica as migrations antes da API e do Worker subirem; o `collectstatic` roda no build. **No servidor, faça o build sempre na mesma pasta** (`git pull` nela): um clone novo não tem as migrations que o banco de lá já aplicou.
+
 Cada repositório da arquitetura usa portas próprias, para os três rodarem lado a lado: porteiro 8000; passivo 8001 e Postgres 5434; gestão 8002 e Postgres 5435.
 
 No Linux/macOS, se o hook não rodar: `chmod +x .githooks/pre-push`.
