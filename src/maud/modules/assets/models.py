@@ -378,14 +378,10 @@ class Fund(TimestampedModel):
     )
     legal_structure = models.CharField(max_length=50, blank=True, default="")
     open_ended = models.BooleanField(default=True)
-    inception_date = models.DateField(null=True, blank=True)
-    termination_date = models.DateField(null=True, blank=True)
     nav_frequency = models.CharField(max_length=20, blank=True, default="")
-    dealing_frequency = models.CharField(max_length=20, blank=True, default="")
     subscription_settlement_days = models.PositiveSmallIntegerField(null=True, blank=True)
     redemption_notice_days = models.PositiveSmallIntegerField(null=True, blank=True)
     redemption_settlement_days = models.PositiveSmallIntegerField(null=True, blank=True)
-    lockup_days = models.PositiveIntegerField(null=True, blank=True)
     management_fee_pct = models.DecimalField(
         max_digits=18,
         decimal_places=8,
@@ -410,14 +406,6 @@ class Fund(TimestampedModel):
 
     class Meta:
         constraints = [
-            models.CheckConstraint(
-                condition=(
-                    Q(termination_date__isnull=True)
-                    | Q(inception_date__isnull=True)
-                    | Q(termination_date__gte=F("inception_date"))
-                ),
-                name="ck_fund_termination_after_inception",
-            ),
             models.CheckConstraint(
                 condition=Q(management_fee_pct__isnull=True) | Q(management_fee_pct__gte=0),
                 name="ck_fund_management_fee_nonnegative",

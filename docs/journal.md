@@ -15,6 +15,12 @@ Modelo:
 
 ---
 
+## 2026-11-26 · assets · cadastro de fundos simplificado
+- **O que mudou:** removidos início, término, frequência de negociação e lockup do cadastro de fundo; o vínculo com o fundo pai foi preservado.
+- **Por quê:** manter no cadastro mestre somente dados próprios do veículo e deixar regras operacionais para aplicação e resgate.
+- **Pendente / atenção:** `parent_fund` continua sendo a ligação entre share classes do mesmo fundo.
+- **Autor:** Felipe Linhares (+ IA)
+
 ## 2026-11-26 · assets · cadastro de equity simplificado
 - **O que mudou:** removidos indústria, direito a voto, frequência de dividendos, ativo subjacente, depositary ratio e ações em circulação.
 - **Por quê:** manter no MVP somente tipo e setor como detalhes próprios de equity.
