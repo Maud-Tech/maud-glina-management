@@ -65,7 +65,7 @@ class CashAssetAdmin(ReadOnlyAdmin):
 
 @admin.register(Equity)
 class EquityAdmin(ReadOnlyAdmin):
-    list_display = ("asset", "equity_type", "sector", "industry")
+    list_display = ("asset", "equity_type", "sector")
     list_filter = ("equity_type",)
 
 

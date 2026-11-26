@@ -189,14 +189,6 @@ class Equity(TimestampedModel):
         PARTNERSHIP_UNIT = "PARTNERSHIP_UNIT", "Unidade de parceria"
         OTHER = "OTHER", "Outro"
 
-    class DividendFrequency(models.TextChoices):
-        MONTHLY = "MONTHLY", "Mensal"
-        QUARTERLY = "QUARTERLY", "Trimestral"
-        SEMIANNUAL = "SEMIANNUAL", "Semestral"
-        ANNUAL = "ANNUAL", "Anual"
-        IRREGULAR = "IRREGULAR", "Irregular"
-        NONE = "NONE", "Nenhuma"
-
     asset = models.OneToOneField(
         Asset,
         on_delete=models.PROTECT,
@@ -205,46 +197,9 @@ class Equity(TimestampedModel):
     )
     equity_type = models.CharField(max_length=30, choices=Type.choices)
     sector = models.CharField(max_length=100, blank=True, default="")
-    industry = models.CharField(max_length=100, blank=True, default="")
-    voting_rights = models.BooleanField(default=False)
-    dividend_frequency = models.CharField(
-        max_length=20,
-        choices=DividendFrequency.choices,
-        blank=True,
-        default="",
-    )
-    underlying_asset = models.ForeignKey(
-        Asset,
-        on_delete=models.PROTECT,
-        related_name="depositary_receipts",
-        null=True,
-        blank=True,
-    )
-    depositary_ratio = models.DecimalField(
-        max_digits=28,
-        decimal_places=8,
-        null=True,
-        blank=True,
-    )
-    shares_outstanding = models.DecimalField(
-        max_digits=28,
-        decimal_places=8,
-        null=True,
-        blank=True,
-    )
 
     class Meta:
         verbose_name_plural = "equities"
-        constraints = [
-            models.CheckConstraint(
-                condition=Q(depositary_ratio__isnull=True) | Q(depositary_ratio__gt=0),
-                name="ck_equity_depositary_ratio_positive",
-            ),
-            models.CheckConstraint(
-                condition=Q(shares_outstanding__isnull=True) | Q(shares_outstanding__gte=0),
-                name="ck_equity_shares_nonnegative",
-            ),
-        ]
 
     def __str__(self) -> str:
         return str(self.asset)

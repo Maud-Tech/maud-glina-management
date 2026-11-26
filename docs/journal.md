@@ -15,6 +15,12 @@ Modelo:
 
 ---
 
+## 2026-11-26 · assets · cadastro de equity simplificado
+- **O que mudou:** removidos indústria, direito a voto, frequência de dividendos, ativo subjacente, depositary ratio e ações em circulação.
+- **Por quê:** manter no MVP somente tipo e setor como detalhes próprios de equity.
+- **Pendente / atenção:** relações de recibos depositários e demais dados podem voltar quando houver um caso de uso concreto.
+- **Autor:** Felipe Linhares (+ IA)
+
 ## 2026-11-26 · assets · cadastro de dívida simplificado
 - **O que mudou:** removidos valor de face original, frequência de cupom, spread, indicador de default e valores de emissão e resgate do cadastro de dívida.
 - **Por quê:** manter no MVP somente os dados necessários ao uso atual dos instrumentos.
