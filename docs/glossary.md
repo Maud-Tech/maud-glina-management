@@ -37,7 +37,6 @@ Os termos já implementados têm nome em inglês definido. Os demais permanecem 
 | Caixa | `CashAsset` | Moeda representada como ativo único e compartilhado. |
 | Renda variável | `Equity` | Ação, recibo ou unidade negociável vinculada a um ativo. |
 | Instrumento de dívida | `DebtInstrument` | Bond, note ou outro instrumento que representa uma dívida. |
-| Nota estruturada | `StructuredNoteTerms` | Termos adicionais de um instrumento de dívida estruturado. |
 | Fundo | `Fund` | Classe de cotas negociável cadastrada como ativo independente. |
 | Ativo genérico | `GenericAsset` | Ativo temporário ainda não normalizado para uma família definitiva. |
 | Classificação do ativo | `AssetClassification` | Classe estratégica, subclasse, risco e liquidez de um ativo. |

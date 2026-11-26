@@ -14,9 +14,6 @@ from maud.modules.assets.models import (
     Fund,
     GenericAsset,
     PriceSource,
-    StructuredNoteObservation,
-    StructuredNoteTerms,
-    StructuredNoteUnderlying,
     TradingVenue,
 )
 
@@ -76,22 +73,6 @@ class EquityAdmin(ReadOnlyAdmin):
 class DebtInstrumentAdmin(ReadOnlyAdmin):
     list_display = ("asset", "instrument_type", "debt_type", "maturity_date", "defaulted")
     list_filter = ("instrument_type", "debt_type", "perpetual", "defaulted")
-
-
-@admin.register(StructuredNoteTerms)
-class StructuredNoteTermsAdmin(ReadOnlyAdmin):
-    list_display = ("debt_instrument", "payoff_type", "autocallable", "valuation_date")
-    list_filter = ("payoff_type", "autocallable")
-
-
-@admin.register(StructuredNoteUnderlying)
-class StructuredNoteUnderlyingAdmin(ReadOnlyAdmin):
-    list_display = ("structured_note", "underlying_asset", "weight_pct")
-
-
-@admin.register(StructuredNoteObservation)
-class StructuredNoteObservationAdmin(ReadOnlyAdmin):
-    list_display = ("structured_note", "observation_date", "payment_date")
 
 
 @admin.register(Fund)
