@@ -4,12 +4,16 @@ Uso manual:   uv run python scripts/check.py
 Automático:   o hook .githooks/pre-push chama este script com --pre-push antes de cada push.
               Instalação (uma vez por clone): git config core.hooksPath .githooks
 
+Migration não vai para o git (ADR "Migrations fora do git"): a primeira verificação recusa
+qualquer arquivo de migration no índice e, no push, em qualquer commit enviado.
+
 Com --pre-push, depois dos checks ele também:
   - avisa quando o push mexe em partes sensíveis (para você avisar o time);
   - lembra de escrever no docs/journal.md quando há mudança de código sem entrada nova.
 """
 
 import fnmatch
+import re
 import shutil
 import subprocess
 import sys
@@ -17,15 +21,10 @@ import time
 
 CHECKS = [
     ("Instruções dos agentes de IA sincronizadas", ["python", "scripts/sync_agents.py", "--check"]),
-    ("Banco acessível e migrado", ["python", "manage.py", "migrate", "--check"]),
     ("Formatação", ["ruff", "format", "--check", "."]),
     ("Lint", ["ruff", "check", "."]),
     ("Tipos", ["mypy"]),
     ("Fronteiras entre módulos", ["lint-imports", "--no-cache"]),
-    (
-        "Migrations em dia com os models",
-        ["python", "manage.py", "makemigrations", "--check", "--dry-run"],
-    ),
     ("Testes", ["pytest", "-q"]),
 ]
 
@@ -33,18 +32,14 @@ HINTS = {
     "Instruções dos agentes de IA sincronizadas": (
         "Edite só AGENTS.md / .agents/ e gere o resto: uv run python scripts/sync_agents.py"
     ),
-    "Banco acessível e migrado": (
-        "Suba o banco e migre: docker compose up -d db && uv run python manage.py migrate"
-    ),
     "Formatação": "Corrija com: uv run ruff format .",
     "Lint": "Muitos se corrigem com: uv run ruff check . --fix",
-    "Migrations em dia com os models": "Gere a migration: uv run python manage.py makemigrations",
 }
 
 SENSITIVE = [
     "src/maud/shared/*",
     "src/maud/*/api.py",
-    "src/maud/*/migrations/*",
+    "src/maud/*/models.py",
     # Módulos críticos do projeto (ledgers, dinheiro): acrescente aqui,
     # ex.: "src/maud/modules/<modulo>/*".
     "tests/acceptance/*",
@@ -55,9 +50,40 @@ SENSITIVE = [
 
 EMPTY_SHA = "0" * 40
 
+NO_MIGRATIONS = "Nenhuma migration no git"
+MIGRATION_FILE = re.compile(r"(^|/)migrations/(?!__init__\.py$)[^/]+\.py$")
 
-def run_checks() -> bool:
+
+def migrations_in_git(push_lines: list[str]) -> list[str]:
+    """Arquivos de migration no índice e, no push, nos commits enviados (só __init__.py passa)."""
+    paths = set(git("ls-files").splitlines())
+    for line in push_lines:
+        parts = line.split()
+        if len(parts) != 4 or parts[1] == EMPTY_SHA:
+            continue
+        local_sha, remote_sha = parts[1], parts[3]
+        if remote_sha == EMPTY_SHA:  # branch nova no remoto: o que o remoto ainda não tem
+            commits = f"{local_sha} --not --remotes"
+        else:
+            commits = f"{remote_sha}..{local_sha}"
+        listing = git(f"log --name-only --diff-filter=ACMR --pretty=format: {commits}")
+        paths.update(listing.splitlines())
+    return sorted(path for path in paths if MIGRATION_FILE.search(path))
+
+
+def run_checks(push_lines: list[str]) -> bool:
     failed = []
+    found = migrations_in_git(push_lines)
+    if found:
+        failed.append(NO_MIGRATIONS)
+        print(f"  FALHOU  {NO_MIGRATIONS}")
+        for path in found[:15]:
+            print(f"          - {path}")
+        print("          -> Migration não sobe. Tire do git (o arquivo fica na sua máquina):")
+        print("             git rm --cached <arquivo>, e refaça o commit que a levou.")
+    else:
+        print(f"  ok      {NO_MIGRATIONS}")
+
     for name, command in CHECKS:
         executable = sys.executable if command[0] == "python" else shutil.which(command[0])
         if executable is None:
@@ -134,7 +160,7 @@ def main() -> int:
     push_lines = sys.stdin.read().splitlines() if pre_push else []
 
     print("Verificando antes de subir..." if pre_push else "Verificando...")
-    ok = run_checks()
+    ok = run_checks(push_lines)
 
     if pre_push and ok:
         pre_push_reminders(changed_files_in_push(push_lines))

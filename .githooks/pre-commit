@@ -1,0 +1,10 @@
+#!/bin/sh
+# Recusa o commit que leva arquivo de migration (ADR "Migrations fora do git").
+# Instalação, uma vez por clone:  git config core.hooksPath .githooks
+staged=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '(^|/)migrations/[^/]+\.py$' | grep -v '/__init__\.py$')
+if [ -n "$staged" ]; then
+    echo "Commit recusado: migration não vai para o git."
+    echo "$staged" | sed 's/^/  - /'
+    echo "Tire do commit (o arquivo fica na sua máquina):  git restore --staged <arquivo>"
+    exit 1
+fi

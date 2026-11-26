@@ -26,7 +26,7 @@ Os módulos são os contextos de negócio. Dentro de cada um, cada caso de uso �
 | Peça | Escolha | Por quê |
 |---|---|---|
 | Linguagem | Python 3.12+ | Mesmo ecossistema dos outros sistemas da Maud. |
-| Framework | **Django 5 + Django Ninja** | ORM com `select_for_update` e transações explícitas, migrations **versionadas**, admin para consulta. O Ninja dá API tipada com Pydantic e OpenAPI automático, que vira contrato para parceiros. |
+| Framework | **Django 5 + Django Ninja** | ORM com `select_for_update` e transações explícitas, migrations (fora do git: cada um gera na sua máquina), admin para consulta. O Ninja dá API tipada com Pydantic e OpenAPI automático, que vira contrato para parceiros. |
 | Banco | PostgreSQL 16 | Locks de linha, `NUMERIC`, constraints, triggers e advisory locks. **Testes também em Postgres** (nada de SQLite: lock e decimal se comportam diferente). |
 | Worker | Processo único `manage.py worker`, agendador simples e **advisory lock** | Sem Redis nem Celery no início ([ADR 0004](adr/0004-worker-without-broker.md)). |
 | Eventos para fora | **Transactional outbox** + Worker despacha webhooks assinados com retry | Nenhum evento se perde, nem é emitido sem o fato ter acontecido. |
@@ -123,11 +123,11 @@ Referências prontas: `modules/example/features/create_item/` (comando) e `list_
 
 Com IA escrevendo código, as regras críticas **também** ficam no banco. Mesmo que um handler esteja errado, o Postgres recusa.
 
-- **Ledgers append-only:** tabelas de lançamento ganham `shared.db.append_only(...)` na migration; um trigger bloqueia `UPDATE`/`DELETE`. Correção é **estorno**.
+- **Ledgers append-only:** o model de lançamento ganha `@append_only` (`shared.db`); a cada `migrate` um trigger bloqueia `UPDATE`/`DELETE`. Correção é **estorno**.
 - **Saldos derivados:** saem da soma do ledger; se precisar de performance, tabela materializada atualizada na mesma transação e conferida por um job.
 - **Tipos:** `Decimal` dentro de `Money` e `Shares`; `NUMERIC` no banco. **`float` é proibido** em `src/` (teste de arquitetura).
 - **Constraints explícitas:** `CheckConstraint`, `UniqueConstraint` (idempotência, versões por data-base), FKs entre módulos **só no sentido da dependência**.
-- **Migrations:** versionadas e revisadas por humano. Nunca editar migração já aplicada (skill `new-migration`).
+- **Migrations:** não vão para o git. Quem gera e aplica é o humano, na máquina dele; o agente só altera o `models.py` (skill `new-migration`).
 
 ## 8. Documentação para humanos e IA
 

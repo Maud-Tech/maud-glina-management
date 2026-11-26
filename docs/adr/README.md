@@ -15,3 +15,4 @@ As decisões 0001–0007 vêm do boilerplate e valem para todo projeto criado a 
 | 0006 | Módulos de negócio em `modules/`, separados da infraestrutura | aceito |
 | 0007 | Agentes de IA: AGENTS.md e .agents/ como fonte única (Claude e Codex) | aceito |
 | 0008 | Este serviço é o app de gestão da arquitetura Glina e pode ser vendido sozinho | aceito |
+| 0009 | Migrations fora do git; o agente nunca roda makemigrations nem migrate | aceito |

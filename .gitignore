@@ -6,4 +6,6 @@ __pycache__/
 .cache/
 *.log
 staticfiles/
-# NUNCA ignore migrations: o schema precisa ser reproduzível a partir do repositório.
+# Migration NUNCA vai para o git (ADR "Migrations fora do git"): só o __init__.py da pasta.
+src/maud/**/migrations/*
+!src/maud/**/migrations/__init__.py

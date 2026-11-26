@@ -24,6 +24,14 @@ jobs:
       POSTGRES_PORT: "5432"
     steps:
       - uses: actions/checkout@v4
+      - name: Nenhuma migration no git
+        run: |
+          found=$(git ls-files | grep -E '(^|/)migrations/[^/]+\.py$' | grep -v '/__init__\.py$' || true)
+          if [ -n "$found" ]; then
+            echo "::error::Migration não vai para o git. Tire com git rm --cached:"
+            echo "$found"
+            exit 1
+          fi
       - uses: astral-sh/setup-uv@v4
         with:
           version: "0.5.24"
@@ -32,7 +40,6 @@ jobs:
       - run: uv run ruff format --check .
       - run: uv run mypy
       - run: uv run lint-imports --no-cache
-      - run: uv run python manage.py makemigrations --check --dry-run
       - run: uv run pytest
 
   acceptance-guard:

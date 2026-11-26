@@ -1,21 +1,25 @@
-"""Proteções no banco para tabelas financeiras. Use em migrations.
+"""Proteções no banco para tabelas financeiras.
 
-Exemplo numa migration de ledger:
+Migration não vai para o git (ADR "Migrations fora do git"), então a proteção não mora em
+migration: o sinal `post_migrate` (ver `apps.py`) a aplica a cada `migrate`, inclusive no
+banco de teste.
+
+Ledger (tabela de lançamentos) marca o model:
 
     from maud.shared.db import append_only
 
-    operations = [
-        migrations.CreateModel(name="LedgerEntry", ...),
-        append_only("<app>_ledgerentry"),  # tabela = <label do app>_<model em minúsculas>
-    ]
+    @append_only
+    class LedgerEntry(models.Model):
+        ...
 
-A função `maud_forbid_mutation()` é criada pela migration 0002 de maud.shared, então a
-migration do ledger precisa depender dela: ("shared", "0002_forbid_mutation_function").
+Depois de cada `migrate`, a função `maud_forbid_mutation()` é criada (ou recriada) e cada
+tabela marcada ganha os triggers que recusam UPDATE, DELETE e TRUNCATE.
 """
 
 import re
+from typing import Any
 
-from django.db import migrations
+from django.db import DEFAULT_DB_ALIAS, connections, models, transaction
 
 FORBID_MUTATION_FUNCTION = """
 CREATE OR REPLACE FUNCTION maud_forbid_mutation() RETURNS trigger
@@ -27,6 +31,7 @@ END;
 $$;
 """
 
+# Ainda importado pela migration 0002 que ficou na máquina de quem já tinha o banco.
 DROP_FORBID_MUTATION_FUNCTION = "DROP FUNCTION IF EXISTS maud_forbid_mutation();"
 
 _IDENTIFIER = re.compile(r"^[a-z_][a-z0-9_]{0,62}$")
@@ -51,6 +56,30 @@ def append_only_sql(table: str) -> tuple[str, str]:
     return forward, reverse
 
 
-def append_only(table: str) -> migrations.RunSQL:
-    forward, reverse = append_only_sql(table)
-    return migrations.RunSQL(forward, reverse)
+_APPEND_ONLY_MODELS: list[type[models.Model]] = []
+
+
+def append_only[Model: type[models.Model]](model: Model) -> Model:
+    """Marca o model como ledger: o banco recusa UPDATE, DELETE e TRUNCATE na tabela dele."""
+    if model not in _APPEND_ONLY_MODELS:
+        _APPEND_ONLY_MODELS.append(model)
+    return model
+
+
+def append_only_tables() -> list[str]:
+    """Tabelas dos models marcados com `@append_only`."""
+    return sorted({model._meta.db_table for model in _APPEND_ONLY_MODELS})
+
+
+def apply_protections(*, using: str = DEFAULT_DB_ALIAS, **_: Any) -> None:
+    """Cria a função e os triggers dos ledgers. Ligado ao `post_migrate`; pode rodar de novo."""
+    connection = connections[using]
+    existing = set(connection.introspection.table_names())
+    with transaction.atomic(using=using), connection.cursor() as cursor:
+        cursor.execute(FORBID_MUTATION_FUNCTION)
+        for table in append_only_tables():
+            if table not in existing:
+                continue
+            forward, reverse = append_only_sql(table)
+            cursor.execute(reverse)
+            cursor.execute(forward)

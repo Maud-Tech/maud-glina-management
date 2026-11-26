@@ -9,7 +9,7 @@ Base de todos os módulos. **Não importa nenhum módulo de negócio.** Mudança
 - `errors.py`: `DomainError` (422), `NotFoundError` (404), `ConflictError` (409); `code` estável
 - `idempotency.py`: `run_idempotent(...)` para comandos com Idempotency-Key
 - `outbox.py`: `publish(...)` (dentro de transação), `claim_batch`/`mark_sent`/`mark_failed`
-- `db.py`: `append_only(table)` para migrations de ledger
+- `db.py`: `@append_only` marca o model de ledger; `apply_protections` cria a função e os triggers a cada `migrate` (ligado ao `post_migrate` no `apps.py`)
 - `http.py`: autenticação por X-Api-Key (provisória)
 - `testing.py`: `ApiClient` para testes (fixture `api` no `conftest.py` da raiz)
 

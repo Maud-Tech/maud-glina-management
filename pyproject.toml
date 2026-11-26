@@ -68,7 +68,8 @@ strict = true
 DJANGO_SETTINGS_MODULE = "maud.config.settings"
 testpaths = ["src", "tests"]
 python_files = ["test_*.py"]
-addopts = "-ra --strict-markers --import-mode=importlib"
+# --no-migrations: as tabelas de teste saem direto dos models (migration não vai para o git).
+addopts = "-ra --strict-markers --import-mode=importlib --no-migrations"
 cache_dir = ".cache/pytest"
 
 # ---------------------------------------------------------------- import-linter

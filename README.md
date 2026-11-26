@@ -47,6 +47,7 @@ Pré-requisitos: Python 3.12, [uv](https://docs.astral.sh/uv/) e Docker.
 cp .env.example .env
 docker compose up -d db                  # Postgres na porta 5435
 uv sync
+uv run python manage.py makemigrations   # gera as migrations só na sua máquina (não vão para o git)
 uv run python manage.py migrate
 git config core.hooksPath .githooks      # uma vez por clone: liga a checagem antes do push
 uv run python manage.py runserver 8002   # API em http://localhost:8002/api/v1/docs
@@ -65,7 +66,7 @@ No Linux/macOS, se o hook não rodar: `chmod +x .githooks/pre-push`.
 uv run python scripts/check.py
 ```
 
-Roda as mesmas verificações do pre-push: agentes de IA sincronizados, banco migrado, formatação, lint, tipos, fronteiras entre módulos, migrations e testes (em Postgres real, nunca SQLite).
+Roda as mesmas verificações do pre-push: nenhuma migration no git, agentes de IA sincronizados, formatação, lint, tipos, fronteiras entre módulos e testes (em Postgres real, nunca SQLite).
 
 ## Como trabalhamos
 

@@ -56,4 +56,4 @@ Quando o primeiro módulo real tiver uma slice de comando e uma de consulta:
 2. Apague `src/maud/modules/example/`; tire-o de `INSTALLED_APPS`, de `config/api.py` e de todos os contratos do `pyproject.toml`.
 3. Peça ao **humano** para apagar `tests/acceptance/test_item_creation.py` (é do exemplo, mas a pasta é protegida: o agente não apaga teste de aceitação) e troque `example_*` em `tests/architecture/test_openapi_ids.py` e `tests/concurrency/test_idempotency_race.py` pelas slices reais.
 4. Troque `example.item_created` em `docs/contracts/README.md`, tire `Item` do glossário e rode `scripts/sync_agents.py` e `scripts/check.py`.
-5. Se o banco de algum ambiente já tem a tabela `example_item`, crie uma migration que a remova antes de apagar o módulo (skill `new-migration`).
+5. Se o banco de algum ambiente já tem a tabela `example_item`, avise o humano antes de apagar o módulo: quem remove a tabela é ele (o agente não roda `makemigrations` nem `migrate`).

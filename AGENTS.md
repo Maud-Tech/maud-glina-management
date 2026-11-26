@@ -60,7 +60,7 @@ Pedido que não cabe em nenhum caminho: pare e pergunte antes de inventar estrut
 ```
 docker compose up -d db               # Postgres de dev (porta em POSTGRES_PORT, padrão 5435)
 uv sync                               # dependências
-uv run python manage.py migrate
+# makemigrations e migrate: só o humano roda, na máquina dele (migration não vai para o git)
 uv run python scripts/check.py        # TODAS as verificações (o mesmo que roda antes do push)
 uv run pytest                         # só os testes (Postgres real; nunca SQLite)
 ```
@@ -73,7 +73,7 @@ Antes de dizer que terminou: **`uv run python scripts/check.py` termina com "Tud
 - Commit: `<módulo>: <o que mudou>`, em português. Ex.: `example: busca de itens por trecho do nome`.
 - O hook de `pre-push` roda o `scripts/check.py`; se falhar, o push não sobe. Nunca sugira `--no-verify`.
 - **Terminar = checar + documentar:** (1) `scripts/check.py` passa, (2) lista de slices do `AGENTS.md` do módulo atualizada, (3) entrada nova no topo de `docs/journal.md` (modelo no próprio arquivo), (4) ADR se houve decisão de projeto.
-- Mexeu em `shared/`, `api.py`, migrations, `tests/acceptance`, `docs/contracts` ou nas instruções dos agentes: diga ao humano para avisar o time.
+- Mexeu em `shared/`, `api.py`, `models.py`, `tests/acceptance`, `docs/contracts` ou nas instruções dos agentes: diga ao humano para avisar o time.
 
 ## Regras duras
 
@@ -82,8 +82,8 @@ Antes de dizer que terminou: **`uv run python scripts/check.py` termina com "Tud
 3. **Dinheiro e cotas são `Money`/`Shares` (Decimal).** `float` é proibido em `src/` (teste de arquitetura). Arredondar é sempre explícito.
 4. **`domain/` é puro:** sem Django, sem I/O, sem relógio. Recebe dados, devolve decisão.
 5. **Escrita vinda de fora é idempotente** (`run_idempotent`) e **todo fato publicado para fora vai pelo outbox** na mesma transação.
-6. **Ledgers são append-only** (`shared.db.append_only` na migration). Correção = estorno, nunca UPDATE/DELETE.
-7. **Migrations são versionadas** e nunca editadas depois de aplicadas. Use a skill `new-migration`.
+6. **Ledgers são append-only** (`@append_only` de `shared.db` no model; os triggers entram a cada `migrate`). Correção = estorno, nunca UPDATE/DELETE.
+7. **Migration não vai para o git, e o agente nunca roda `makemigrations` nem `migrate`** ([ADR 0009](docs/adr/0009-migrations-out-of-git.md)). Mudou tabela: altere só o `models.py` e avise o humano, que gera e aplica na máquina dele (skill `new-migration`). O hook `pre-commit`, o `scripts/check.py` e o CI recusam arquivo de migration.
 8. **Só o próprio módulo escreve nas suas tabelas.** Outros módulos pedem via `api.py`.
 9. **Uma slice por tarefa.** Feature nova: skill `new-feature` (cenários antes de código).
 10. **Todo nome em inglês; português só em texto livre** (seção abaixo e [ADR 0003](docs/adr/0003-language.md)).
