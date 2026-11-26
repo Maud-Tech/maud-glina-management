@@ -172,7 +172,6 @@ def test_normalized_generic_asset_requires_destination(asset: Asset) -> None:
     with pytest.raises(IntegrityError), transaction.atomic():
         GenericAsset.objects.create(
             asset=asset,
-            original_source="IMPORT",
             original_code="UNKNOWN-1",
             raw_data={},
             normalization_status=GenericAsset.NormalizationStatus.NORMALIZED,
