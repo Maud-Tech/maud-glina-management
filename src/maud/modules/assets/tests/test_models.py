@@ -41,7 +41,6 @@ def asset(usd: Any) -> Asset:
         short_name="EXAMPLE",
         currency=usd,
         market_type=Asset.MarketType.LISTED,
-        source="MANUAL",
     )
 
 
@@ -82,7 +81,6 @@ def test_ticker_is_unique_inside_trading_venue(
         short_name="SECOND",
         currency=usd,
         market_type=Asset.MarketType.LISTED,
-        source="MANUAL",
     )
 
     with pytest.raises(IntegrityError), transaction.atomic():
@@ -105,7 +103,6 @@ def test_identifier_type_and_value_are_globally_unique(asset: Asset, usd: Any) -
         short_name="SECOND",
         currency=usd,
         market_type=Asset.MarketType.OTC,
-        source="MANUAL",
     )
 
     with pytest.raises(IntegrityError), transaction.atomic():
@@ -123,7 +120,6 @@ def test_only_one_cash_asset_exists_for_each_currency(usd: Any) -> None:
         short_name="USD",
         currency=usd,
         market_type=Asset.MarketType.NOT_APPLICABLE,
-        source="SYSTEM",
     )
     CashAsset.objects.create(asset=first_asset, currency=usd)
     second_asset = Asset.objects.create(
@@ -132,7 +128,6 @@ def test_only_one_cash_asset_exists_for_each_currency(usd: Any) -> None:
         short_name="USD 2",
         currency=usd,
         market_type=Asset.MarketType.NOT_APPLICABLE,
-        source="SYSTEM",
     )
 
     with pytest.raises(IntegrityError), transaction.atomic():

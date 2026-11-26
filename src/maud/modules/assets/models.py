@@ -79,7 +79,6 @@ class Asset(TimestampedModel):
     market_type = models.CharField(max_length=20, choices=MarketType.choices)
     description = models.TextField(blank=True, default="")
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.ACTIVE)
-    source = models.CharField(max_length=50)
     metadata = models.JSONField(default=dict, blank=True)
 
     def __str__(self) -> str:
