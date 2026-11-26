@@ -42,7 +42,9 @@ Os termos já implementados têm nome em inglês definido. Os demais permanecem 
 | Classificação do ativo | `AssetClassification` | Classe estratégica, subclasse, risco e liquidez de um ativo. |
 | Fonte de preço | `PriceSource` | Origem de uma observação de preço. |
 | Preço do ativo | `AssetPrice` | Preço de um ativo em uma data, tipo e fonte. |
-| Evento do ativo | `AssetEvent` | Evento econômico ou societário associado a um ativo. |
+| Evento do ativo | `AssetEvent` | Evento econômico ou societário associado a um ativo, identificado por tipo, Data COM e liquidação. |
+| Data COM | `event_date` | Data em que nasce o direito econômico do evento. |
+| Preço COM | `cum_price` | Preço do ativo antes do evento, usado no cálculo do fator. |
 | Item | `Item` | Registro do módulo de demonstração `example`. Apague quando o módulo sair. |
 
 ## Termos da arquitetura (vêm do boilerplate)

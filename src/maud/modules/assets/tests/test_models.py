@@ -8,6 +8,7 @@ from django.db import IntegrityError, transaction
 
 from maud.modules.assets.models import (
     Asset,
+    AssetEvent,
     AssetIdentifier,
     AssetListing,
     AssetPrice,
@@ -192,3 +193,36 @@ def test_price_is_unique_by_asset_date_type_and_source(asset: Asset, usd: Any) -
 
     with pytest.raises(IntegrityError), transaction.atomic():
         AssetPrice.objects.create(**price)
+
+
+def test_event_is_unique_by_asset_type_event_date_and_settlement(asset: Asset) -> None:
+    event = {
+        "asset": asset,
+        "event_type": AssetEvent.Type.DIVIDEND,
+        "event_date": date(2026, 11, 26),
+        "settlement_date": None,
+    }
+    AssetEvent.objects.create(**event)
+
+    with pytest.raises(IntegrityError), transaction.atomic():
+        AssetEvent.objects.create(**event)
+
+
+def test_event_settlement_cannot_precede_event_date(asset: Asset) -> None:
+    with pytest.raises(IntegrityError), transaction.atomic():
+        AssetEvent.objects.create(
+            asset=asset,
+            event_type=AssetEvent.Type.INTEREST,
+            event_date=date(2026, 11, 26),
+            settlement_date=date(2026, 11, 25),
+        )
+
+
+def test_event_cum_price_must_be_positive(asset: Asset) -> None:
+    with pytest.raises(IntegrityError), transaction.atomic():
+        AssetEvent.objects.create(
+            asset=asset,
+            event_type=AssetEvent.Type.DIVIDEND,
+            event_date=date(2026, 11, 26),
+            cum_price=Decimal("0"),
+        )

@@ -109,5 +109,14 @@ class AssetPriceAdmin(ReadOnlyAdmin):
 
 @admin.register(AssetEvent)
 class AssetEventAdmin(ReadOnlyAdmin):
-    list_display = ("asset", "event_type", "record_date", "payment_date", "status")
-    list_filter = ("event_type", "status")
+    list_display = (
+        "asset",
+        "event_date",
+        "settlement_date",
+        "event_type",
+        "amount_paid",
+        "cum_price",
+        "factor",
+        "event_status",
+    )
+    list_filter = ("event_type", "event_status")

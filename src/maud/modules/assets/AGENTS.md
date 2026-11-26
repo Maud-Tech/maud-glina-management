@@ -16,6 +16,7 @@ Depende de: `entities` para moedas, países e entidades que exercem papéis no c
 - Instrumento não perpétuo possui vencimento posterior à emissão; valores nominais são positivos.
 - Cada classe de cotas de fundo é um ativo independente.
 - Preço é único por ativo, data, tipo e fonte.
+- Evento é único por ativo, tipo, Data COM e liquidação; `cum_price` é o Preço COM.
 - Escrita será feita pelas slices; o admin é somente leitura.
 
 ## Fachada (api.py)

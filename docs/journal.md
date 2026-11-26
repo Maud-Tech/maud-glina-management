@@ -15,6 +15,12 @@ Modelo:
 
 ---
 
+## 2026-11-26 · assets · eventos de mercado alinhados à Data COM
+- **O que mudou:** eventos passaram a registrar Data COM, liquidação, taxa, valor pago, Preço COM (`cum_price`), fator e estado padronizado.
+- **Por quê:** refletir a semântica operacional já utilizada no processamento e evitar o nome incorreto “Preço Ex”.
+- **Pendente / atenção:** cálculo de fator, provisionamento e liquidação entrarão em slices próprias.
+- **Autor:** Felipe Linhares (+ IA)
+
 ## 2026-11-26 · assets · modelo cadastral de ativos offshore
 - **O que mudou:** criado o módulo `assets` com identidade, listagens, identificadores, detalhes por família, classificação, preços e eventos.
 - **Por quê:** estabelecer o cadastro mestre de ativos que será usado posteriormente por operações, posições e custódia.

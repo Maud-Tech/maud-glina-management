@@ -667,15 +667,33 @@ class AssetEvent(models.Model):
         CAPITAL_CALL = "CAPITAL_CALL", "Chamada de capital"
         CAPITAL_DISTRIBUTION = "CAPITAL_DISTRIBUTION", "Distribuição de capital"
         FUND_DISTRIBUTION = "FUND_DISTRIBUTION", "Distribuição de fundo"
+        PREMIUM = "PREMIUM", "Prêmio"
+        INTEREST_ON_EQUITY = "INTEREST_ON_EQUITY", "JCP"
         OTHER = "OTHER", "Outro"
+
+    class Status(models.TextChoices):
+        SETTLED = "SETTLED", "Liquidado"
+        EXPECTED = "EXPECTED", "Previsto"
+        UNSETTLED = "UNSETTLED", "Não liquidado"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     asset = models.ForeignKey(Asset, on_delete=models.PROTECT, related_name="events")
     event_type = models.CharField(max_length=30, choices=Type.choices)
-    record_date = models.DateField(null=True, blank=True)
-    ex_date = models.DateField(null=True, blank=True)
-    payment_date = models.DateField(null=True, blank=True)
-    amount_per_unit = models.DecimalField(
+    event_date = models.DateField()
+    settlement_date = models.DateField(null=True, blank=True)
+    percentage_rate = models.DecimalField(
+        max_digits=18,
+        decimal_places=8,
+        null=True,
+        blank=True,
+    )
+    amount_paid = models.DecimalField(
+        max_digits=30,
+        decimal_places=12,
+        null=True,
+        blank=True,
+    )
+    cum_price = models.DecimalField(
         max_digits=30,
         decimal_places=12,
         null=True,
@@ -689,19 +707,40 @@ class AssetEvent(models.Model):
         blank=True,
     )
     factor = models.DecimalField(max_digits=28, decimal_places=8, null=True, blank=True)
-    status = models.CharField(max_length=20)
+    event_status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.EXPECTED,
+    )
     metadata = models.JSONField(default=dict, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         constraints = [
+            models.UniqueConstraint(
+                fields=["asset", "event_type", "event_date", "settlement_date"],
+                name="uq_asset_event_identity",
+                nulls_distinct=False,
+            ),
             models.CheckConstraint(
-                condition=Q(amount_per_unit__isnull=True) | Q(amount_per_unit__gte=0),
+                condition=Q(percentage_rate__isnull=True) | Q(percentage_rate__gte=0),
+                name="ck_asset_event_rate_nonnegative",
+            ),
+            models.CheckConstraint(
+                condition=Q(amount_paid__isnull=True) | Q(amount_paid__gte=0),
                 name="ck_asset_event_amount_nonnegative",
+            ),
+            models.CheckConstraint(
+                condition=Q(cum_price__isnull=True) | Q(cum_price__gt=0),
+                name="ck_asset_event_cum_price_positive",
             ),
             models.CheckConstraint(
                 condition=Q(factor__isnull=True) | Q(factor__gt=0),
                 name="ck_asset_event_factor_positive",
+            ),
+            models.CheckConstraint(
+                condition=Q(settlement_date__isnull=True) | Q(settlement_date__gte=F("event_date")),
+                name="ck_asset_event_settlement_after_event",
             ),
         ]
 
