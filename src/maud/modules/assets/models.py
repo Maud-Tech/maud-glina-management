@@ -315,7 +315,6 @@ class DebtInstrument(TimestampedModel):
     coupon_type = models.CharField(max_length=30, choices=CouponType.choices)
     coupon_rate = models.DecimalField(max_digits=18, decimal_places=8, null=True, blank=True)
     reference_rate = models.CharField(max_length=30, blank=True, default="")
-    day_count_convention = models.CharField(max_length=20, blank=True, default="")
     seniority = models.CharField(
         max_length=30,
         choices=Seniority.choices,

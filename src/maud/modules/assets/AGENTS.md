@@ -14,6 +14,7 @@ Depende de: `entities` para moedas, países e entidades que exercem papéis no c
 - Uma moeda possui no máximo um `CashAsset`; seu ativo usa a mesma moeda.
 - Identificadores externos são únicos pela combinação de tipo e valor.
 - Instrumento não perpétuo possui vencimento posterior à emissão; lote mínimo, quando informado, é positivo.
+- Cálculos de accrual usam o padrão fixo de 252 dias úteis; não há convenção configurável por ativo.
 - Cada classe de cotas de fundo é um ativo independente.
 - Preço é único por ativo, data, tipo e fonte.
 - Evento é único por ativo, tipo, Data COM e liquidação; `cum_price` é o Preço COM.
