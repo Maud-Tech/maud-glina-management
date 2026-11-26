@@ -611,13 +611,9 @@ class AssetPrice(models.Model):
     """Preço de um ativo para uma data, tipo e fonte."""
 
     class Type(models.TextChoices):
-        CLOSE = "CLOSE", "Fechamento"
-        NAV = "NAV", "NAV"
-        BID = "BID", "Compra"
-        ASK = "ASK", "Venda"
-        MID = "MID", "Médio"
-        MODEL = "MODEL", "Modelo"
-        COST = "COST", "Custo"
+        MKT = "MKT", "Mercado"
+        MD = "MD", "Última cotação de mercado disponível"
+        CURVE = "CURVE", "Curva"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     asset = models.ForeignKey(Asset, on_delete=models.PROTECT, related_name="prices")
@@ -630,7 +626,6 @@ class AssetPrice(models.Model):
     )
     price_type = models.CharField(max_length=20, choices=Type.choices)
     source = models.ForeignKey(PriceSource, on_delete=models.PROTECT, related_name="prices")
-    as_of = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

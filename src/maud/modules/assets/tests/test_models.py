@@ -186,7 +186,7 @@ def test_price_is_unique_by_asset_date_type_and_source(asset: Asset, usd: Any) -
         "price_date": date(2026, 11, 26),
         "price": Decimal("10.000000000000"),
         "currency": usd,
-        "price_type": AssetPrice.Type.CLOSE,
+        "price_type": AssetPrice.Type.MKT,
         "source": source,
     }
     AssetPrice.objects.create(**price)

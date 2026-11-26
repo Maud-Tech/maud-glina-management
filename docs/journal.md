@@ -15,6 +15,12 @@ Modelo:
 
 ---
 
+## 2026-11-26 · assets · tipos de preço do MVP
+- **O que mudou:** preços passaram a aceitar somente `MKT`, `MD` e `CURVE`; o horário intradiário `as_of` foi removido.
+- **Por quê:** representar preço de mercado, última cotação disponível sem média ANBIMA e preço de curva para dívida sem marcação.
+- **Pendente / atenção:** a escolha automática do tipo de preço será implementada nas futuras slices de precificação.
+- **Autor:** Felipe Linhares (+ IA)
+
 ## 2026-11-26 · assets · eventos de mercado alinhados à Data COM
 - **O que mudou:** eventos passaram a registrar Data COM, liquidação, taxa, valor pago, Preço COM (`cum_price`), fator e estado padronizado.
 - **Por quê:** refletir a semântica operacional já utilizada no processamento e evitar o nome incorreto “Preço Ex”.

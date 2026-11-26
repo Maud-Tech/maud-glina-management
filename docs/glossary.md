@@ -42,6 +42,9 @@ Os termos já implementados têm nome em inglês definido. Os demais permanecem 
 | Classificação do ativo | `AssetClassification` | Classe estratégica, subclasse, risco e liquidez de um ativo. |
 | Fonte de preço | `PriceSource` | Origem de uma observação de preço. |
 | Preço do ativo | `AssetPrice` | Preço de um ativo em uma data, tipo e fonte. |
+| Preço de mercado | `AssetPrice.Type.MKT` | Preço de mercado de referência disponível para o ativo. |
+| Última cotação disponível | `AssetPrice.Type.MD` | Última cotação do dia para ativo negociado sem preço médio ANBIMA. |
+| Preço de curva | `AssetPrice.Type.CURVE` | Preço de dívida sem marcação a mercado. |
 | Evento do ativo | `AssetEvent` | Evento econômico ou societário associado a um ativo, identificado por tipo, Data COM e liquidação. |
 | Data COM | `event_date` | Data em que nasce o direito econômico do evento. |
 | Preço COM | `cum_price` | Preço do ativo antes do evento, usado no cálculo do fator. |
