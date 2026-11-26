@@ -60,7 +60,7 @@ class AssetIdentifierAdmin(ReadOnlyAdmin):
 
 @admin.register(CashAsset)
 class CashAssetAdmin(ReadOnlyAdmin):
-    list_display = ("asset", "currency", "settlement_days")
+    list_display = ("asset", "currency")
 
 
 @admin.register(Equity)

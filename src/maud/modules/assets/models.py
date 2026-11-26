@@ -171,7 +171,6 @@ class CashAsset(models.Model):
         on_delete=models.PROTECT,
         related_name="cash_asset",
     )
-    settlement_days = models.PositiveSmallIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
