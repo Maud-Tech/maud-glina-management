@@ -1,0 +1,17 @@
+{
+  "description": "maud-glina-management: mesmas proteções do .claude/settings.json (fonte: .agents/hooks/).",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "apply_patch|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$(git rev-parse --show-toplevel)/.agents/hooks/protect_acceptance_tests.py\"",
+            "statusMessage": "Conferindo testes de aceitação protegidos"
+          }
+        ]
+      }
+    ]
+  }
+}

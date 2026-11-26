@@ -1,0 +1,52 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: maud
+          POSTGRES_PASSWORD: maud
+          POSTGRES_DB: maud_glina_management
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U maud -d maud_glina_management" --health-interval 2s --health-timeout 3s --health-retries 30
+    env:
+      DJANGO_DEBUG: "true"
+      POSTGRES_HOST: localhost
+      POSTGRES_PORT: "5432"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+        with:
+          version: "0.5.24"
+      - run: uv sync --frozen
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run mypy
+      - run: uv run lint-imports --no-cache
+      - run: uv run python manage.py makemigrations --check --dry-run
+      - run: uv run pytest
+
+  acceptance-guard:
+    # Marca o PR quando um teste de aceitação EXISTENTE muda (criação é livre).
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Testes de aceitação alterados
+        run: |
+          changed=$(git diff --name-only --diff-filter=MDR origin/${{ github.base_ref }}...HEAD -- tests/acceptance/ || true)
+          if [ -n "$changed" ]; then
+            echo "::warning::Testes de aceitação existentes foram alterados. Revisar com atenção:"
+            echo "$changed"
+          fi

@@ -1,0 +1,8 @@
+# Revisão humana obrigatória (ative "Require review from Code Owners" na proteção da branch).
+# Substitua <revisores> pelos usuários/times do GitHub antes de ativar.
+#
+# /tests/acceptance/      <revisores>
+# /src/maud/shared/       <revisores>
+# /src/maud/*/api.py      <revisores>
+# /src/maud/*/migrations/ <revisores>
+# /docs/adr/              <revisores>

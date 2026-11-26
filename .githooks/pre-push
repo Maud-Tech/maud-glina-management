@@ -1,0 +1,4 @@
+#!/bin/sh
+# Roda as verificações antes de cada push (ver scripts/check.py).
+# Instalação, uma vez por clone:  git config core.hooksPath .githooks
+exec uv run python scripts/check.py --pre-push

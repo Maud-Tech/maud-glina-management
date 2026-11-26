@@ -1,0 +1,2 @@
+# Hooks precisam de LF para rodar em Linux/macOS.
+.githooks/* text eol=lf
