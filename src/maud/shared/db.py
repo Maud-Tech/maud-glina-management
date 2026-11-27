@@ -14,6 +14,10 @@ Ledger (tabela de lançamentos) marca o model:
 
 Depois de cada `migrate`, a função `maud_forbid_mutation()` é criada (ou recriada) e cada
 tabela marcada ganha os triggers que recusam UPDATE, DELETE e TRUNCATE.
+
+Exceção só do banco de teste: o Django limpa o banco com TRUNCATE entre os testes de transação
+real. O `conftest.py` da raiz liga `maud.allow_test_truncate` no banco de teste, e só o TRUNCATE
+passa. UPDATE e DELETE continuam recusados, em teste e em produção.
 """
 
 import re
@@ -25,11 +29,17 @@ FORBID_MUTATION_FUNCTION = """
 CREATE OR REPLACE FUNCTION maud_forbid_mutation() RETURNS trigger
 LANGUAGE plpgsql AS $$
 BEGIN
+    IF TG_OP = 'TRUNCATE' AND current_setting('maud.allow_test_truncate', true) = 'on' THEN
+        RETURN NULL;
+    END IF;
     RAISE EXCEPTION 'tabela % é append-only: corrija com estorno, não com %', TG_TABLE_NAME, TG_OP
         USING ERRCODE = 'P0001';
 END;
 $$;
 """
+
+# Chave que só o banco de teste liga (conftest.py da raiz): deixa o TRUNCATE do Django passar.
+TEST_TRUNCATE_SETTING = "maud.allow_test_truncate"
 
 # Ainda importado pela migration 0002 que ficou na máquina de quem já tinha o banco.
 DROP_FORBID_MUTATION_FUNCTION = "DROP FUNCTION IF EXISTS maud_forbid_mutation();"

@@ -15,6 +15,18 @@ Modelo:
 
 ---
 
+## 2026-11-27 · shared · ledger aceita TRUNCATE só no banco de teste
+- **O que mudou:** o trigger dos ledgers (`maud_forbid_mutation`) deixa passar o TRUNCATE quando a chave `maud.allow_test_truncate` está ligada, e só o `conftest.py` da raiz a liga, no banco de teste. UPDATE e DELETE continuam recusados em qualquer banco. Teste novo em `shared/tests/test_db.py`.
+- **Por quê:** os primeiros ledgers de verdade (`ProductChange`, `MandateChange`) quebraram os testes de transação real (outbox e concorrência): o Django limpa o banco com TRUNCATE entre eles e o trigger recusava.
+- **Pendente / atenção:** mexe em `shared/` e no `conftest.py` da raiz: avisar o time. Quem já tem banco local recria a função no próximo `migrate` (post_migrate).
+- **Autor:** Victor (+ IA)
+
+## 2026-11-27 · projeto · banco local em 127.0.0.1, não localhost
+- **O que mudou:** `POSTGRES_HOST` do `.env.example` (e o padrão do `settings.py`) passou de `localhost` para `127.0.0.1`.
+- **Por quê:** o banco só escuta no IPv4 da própria máquina. No Windows com Docker Desktop, `localhost` tenta o IPv6 (`::1`) primeiro e a conexão fica pendurada: os testes travavam já no primeiro teste com banco. Com `127.0.0.1`, os 126 testes rodaram contra Postgres em cerca de 1 minuto (primeira rodada com banco real, pendente desde a entrega das telas).
+- **Pendente / atenção:** quem já tem `.env` com `POSTGRES_HOST=localhost` e usa Windows deve trocar para `127.0.0.1`. O CI (Linux) não é afetado.
+- **Autor:** Victor (+ IA)
+
 ## 2026-11-27 · projeto · banco local em 127.0.0.1, não localhost
 - **O que mudou:** `POSTGRES_HOST` do `.env.example` (e o padrão do `settings.py`) passou de `localhost` para `127.0.0.1`.
 - **Por quê:** o banco só escuta no IPv4 da própria máquina. No Windows com Docker Desktop, `localhost` tenta o IPv6 (`::1`) primeiro e a conexão fica pendurada: os testes travavam já no primeiro teste com banco. Com `127.0.0.1`, os 126 testes rodaram contra Postgres em cerca de 1 minuto (primeira rodada com banco real, pendente desde a entrega das telas).
