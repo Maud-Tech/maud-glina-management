@@ -1,0 +1,76 @@
+{% extends "web/base.html" %}
+{% block title %}Personalização{% endblock %}
+{% block crumb %}<a href="{% url 'dashboard' %}">Painel</a> &nbsp;/&nbsp; <span>Personalização</span>{% endblock %}
+{% block content %}
+<h1>Personalizar a <mark>gestora</mark>.</h1>
+<p class="lead">Nome, cor e logotipo aparecem em todas as telas, inclusive na de entrar. Vale para todos os usuários desta instalação.</p>
+
+<form method="post" enctype="multipart/form-data" novalidate>{% csrf_token %}
+<div class="body">
+  <div>
+    <section class="sec">
+      <div><h2>Identidade</h2><p class="hint">Como a gestora aparece no menu, na aba do navegador e nos relatórios. Opcional: se o logotipo já traz o nome, pode deixar em branco.</p></div>
+      <div class="grid">
+        <div class="f full{% if form.name.errors %} bad{% endif %}">
+          <label for="id_name">Nome da gestora</label>
+          <input class="in" id="id_name" name="name" value="{{ form.name.value|default:'' }}" maxlength="200">
+          {% for error in form.name.errors %}<div class="msg">{{ error }}</div>{% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div><h2>Cor</h2><p class="hint">Uma cor só. Botões, etapa atual e destaques saem dela; o texto em cima fica escuro ou branco, o que for mais legível.</p></div>
+      <div class="f{% if form.brand_color.errors %} bad{% endif %}">
+        <div class="swatches" role="radiogroup" aria-label="Cores sugeridas">
+          {% for swatch in swatches %}<label class="swatch" title="{{ swatch }}"><input type="radio" name="brand_color_swatch" value="{{ swatch }}" data-brand-input{% if swatch == chosen_color %} checked{% endif %}><span style="--c: {{ swatch }}"></span></label>{% endfor %}
+        </div>
+        <div class="color-row">
+          <input type="color" value="{{ chosen_color|lower }}" data-brand-input aria-label="Escolher outra cor">
+          <input class="in" id="id_brand_color" name="brand_color" value="{{ form.brand_color.value|default:'' }}" maxlength="20" data-brand-input aria-label="Cor em hexadecimal">
+        </div>
+        {% for error in form.brand_color.errors %}<div class="msg">{{ error }}</div>{% endfor %}
+      </div>
+    </section>
+
+    <section class="sec">
+      <div><h2>Logotipo</h2><p class="hint">PNG, JPG ou WEBP, até 2 MB. Fundo transparente fica melhor nos dois temas.</p></div>
+      <div class="f{% if form.logo.errors %} bad{% endif %}">
+        {% if current.has_logo %}<div class="current-image"><img src="{% url 'branding_image' 'logo' %}?v={{ current.version }}" alt="Logotipo atual">Logotipo atual
+          <label class="check"><input type="checkbox" name="remove_logo"> Remover</label></div>{% endif %}
+        <label class="drop"><input type="file" name="logo" accept="image/png,image/jpeg,image/webp"><i class="ti ti-upload" aria-hidden="true"></i>
+          <div>Arraste a imagem aqui ou <span class="link">escolha no computador</span><br><small class="chosen"></small></div></label>
+        {% for error in form.logo.errors %}<div class="msg">{{ error }}</div>{% endfor %}
+      </div>
+    </section>
+
+    <section class="sec">
+      <div><h2>Ícone da aba</h2><p class="hint">O desenho pequeno na aba do navegador. PNG ou ICO, quadrado.</p></div>
+      <div class="f{% if form.favicon.errors %} bad{% endif %}">
+        {% if current.has_favicon %}<div class="current-image"><img src="{% url 'branding_image' 'favicon' %}?v={{ current.version }}" alt="Ícone atual">Ícone atual
+          <label class="check"><input type="checkbox" name="remove_favicon"> Remover</label></div>{% endif %}
+        <label class="drop"><input type="file" name="favicon" accept="image/png,image/x-icon,.ico"><i class="ti ti-upload" aria-hidden="true"></i>
+          <div>Arraste o ícone aqui ou <span class="link">escolha no computador</span><br><small class="chosen"></small></div></label>
+        {% for error in form.favicon.errors %}<div class="msg">{{ error }}</div>{% endfor %}
+      </div>
+    </section>
+  </div>
+
+  <aside class="aside">
+    <div class="quote"><b>Prévia</b><span>Muda enquanto você escolhe a cor.</span></div>
+    <div class="preview">
+      {% include "web/_wordmark.html" %}
+      <span class="pill"><small>02</small>Etapa atual</span>
+      <button class="btn primary" type="button" tabindex="-1">Botão principal</button>
+    </div>
+  </aside>
+</div>
+
+<div class="bar">
+  <span class="note">Vale para todos os usuários assim que você salvar.</span>
+  <div class="grow"></div>
+  <a class="btn" href="{% url 'dashboard' %}">Cancelar</a>
+  <button class="btn primary" type="submit">Salvar <i class="ti ti-check" aria-hidden="true"></i></button>
+</div>
+</form>
+{% endblock %}

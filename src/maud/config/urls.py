@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.db import connection
 from django.http import HttpRequest, JsonResponse
-from django.urls import path
+from django.urls import include, path
 
 from maud.config.api import api
 
@@ -17,4 +17,7 @@ urlpatterns = [
     path("health", health),
     path("admin/", admin.site.urls),
     path("api/v1/", api.urls),
+    # Telas (ADR 0010): a casca e, por módulo, o pages.py com as telas das slices.
+    path("", include("maud.web.urls")),
+    path("", include("maud.modules.branding.pages")),
 ]

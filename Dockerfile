@@ -19,7 +19,7 @@ RUN uv sync --no-dev
 # migration não foi gerada antes: o banco não recebe um histórico que não bate com os models.
 RUN DJANGO_DEBUG=true python manage.py makemigrations --check --dry-run
 
-# Arquivos estáticos (admin) prontos na imagem, em staticfiles/.
+# Arquivos estáticos (casca das telas e admin) prontos na imagem, em staticfiles/.
 RUN DJANGO_DEBUG=true python manage.py collectstatic --noinput
 
-EXPOSE 8000
+EXPOSE 8080

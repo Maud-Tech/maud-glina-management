@@ -6,6 +6,8 @@ __pycache__/
 .cache/
 *.log
 staticfiles/
+# Arquivos enviados pela tela (ADR 0010): ficam no storage, nunca no git.
+media/
 # Migration NUNCA vai para o git (ADR "Migrations fora do git"): só o __init__.py da pasta.
 src/maud/**/migrations/*
 !src/maud/**/migrations/__init__.py

@@ -36,6 +36,11 @@ if not SECRET_KEY:
 ALLOWED_HOSTS = [
     h.strip() for h in _env("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",") if h
 ]
+# Endereços com https na frente de um proxy (ex.: tailscale serve). Sem isso o "Entrar" falha
+# com erro de CSRF, porque o navegador diz https e o Django recebe http.
+CSRF_TRUSTED_ORIGINS = [
+    o.strip() for o in _env("DJANGO_CSRF_TRUSTED_ORIGINS").split(",") if o.strip()
+]
 
 # Chaves de API aceitas no header X-Api-Key (ver maud.shared.http).
 MAUD_API_KEYS = [k.strip() for k in _env("MAUD_API_KEYS").split(",") if k.strip()]
@@ -56,9 +61,11 @@ INSTALLED_APPS = [
     "ninja",
     # Módulos, de baixo para cima (mesma ordem das camadas do import-linter).
     "maud.shared",
+    "maud.modules.branding",
     "maud.modules.entities",
     "maud.modules.assets",
     "maud.modules.example",
+    "maud.web",  # telas (ADR 0010): casca, login, painel
     "maud.jobs",
 ]
 
@@ -79,13 +86,15 @@ WSGI_APPLICATION = "maud.config.wsgi.application"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        # Raiz do pacote: a tela de cada slice mora ao lado do handler (features/<slice>/page.html).
+        "DIRS": [BASE_DIR / "src" / "maud"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "maud.web.context_processors.shell",
             ],
         },
     },
@@ -113,10 +122,18 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"  # gerado pelo collectstatic no build da imagem
+# Arquivos enviados pela tela (ADR 0010). Hoje a pasta media/ (fora do git, volume no Docker);
+# em produção, um storage de objetos: troque só o "default" abaixo. O código usa sempre o storage.
+MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_URL = "media/"
 STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
     "staticfiles": {"BACKEND": "whitenoise.storage.CompressedStaticFilesStorage"},
 }
+
+LOGIN_URL = "login"
+LOGIN_REDIRECT_URL = "dashboard"
+LOGOUT_REDIRECT_URL = "login"
 
 LOGGING = {
     "version": 1,

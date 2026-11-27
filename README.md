@@ -45,20 +45,22 @@ Pré-requisitos: Python 3.12, [uv](https://docs.astral.sh/uv/) e Docker.
 
 ```
 cp .env.example .env
-docker compose up -d db                  # Postgres na porta 5435
+docker compose up -d db                  # Postgres na porta POSTGRES_PORT do .env (5435)
 uv sync
 uv run python manage.py makemigrations   # gera as migrations só na sua máquina (não vão para o git)
 uv run python manage.py migrate
 git config core.hooksPath .githooks      # uma vez por clone: liga a checagem antes do push
-uv run python manage.py runserver 8002   # API em http://localhost:8002/api/v1/docs
+uv run python manage.py runserver 8080   # telas e API em http://localhost:8080 (API_PORT do .env)
 uv run python manage.py worker           # Worker (outro terminal)
 ```
 
-Tudo em containers: `docker compose up --build` (API na porta 8002).
+Tudo em containers: `docker compose up --build` (telas e API na porta `API_PORT` do .env, 8080).
+
+**Portas só no `.env`.** O `docker-compose.yml` não tem porta escrita: Postgres escuta em `POSTGRES_PORT` e a API em `API_PORT`, iguais dentro e fora do container. Para mudar, troque no `.env` e rode `docker compose up -d` de novo. O banco só aceita conexão da própria máquina (`127.0.0.1`). Na máquina que já roda mcore e fidccopobras, as portas 5431, 5432 e 5433 estão ocupadas: use outras.
 
 **Build e migrations.** Migration não vai para o git, mas vai na imagem: o build copia as que estão na pasta do projeto e falha se algum model mudou sem migration gerada. Antes do build, gere na sua máquina (`uv run python manage.py makemigrations`). O serviço `migrate` aplica as migrations antes da API e do Worker subirem; o `collectstatic` roda no build. **No servidor, faça o build sempre na mesma pasta** (`git pull` nela): um clone novo não tem as migrations que o banco de lá já aplicou.
 
-Cada repositório da arquitetura usa portas próprias, para os três rodarem lado a lado: porteiro 8000; passivo 8001 e Postgres 5434; gestão 8002 e Postgres 5435.
+Cada repositório da arquitetura usa portas próprias, para os três rodarem lado a lado: porteiro 8000; passivo 8001 e Postgres 5434; gestão 8080 e Postgres 5435.
 
 No Linux/macOS, se o hook não rodar: `chmod +x .githooks/pre-push`.
 

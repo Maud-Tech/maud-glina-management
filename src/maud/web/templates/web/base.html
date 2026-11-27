@@ -1,0 +1,34 @@
+{% load static %}<!doctype html>
+<html lang="pt-BR" data-theme="{{ shell.theme }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}{% endblock %}{% if shell.branding.name %} · {{ shell.branding.name }}{% endif %}</title>
+{% if shell.branding.has_favicon %}<link rel="icon" href="{% url 'branding_image' 'favicon' %}?v={{ shell.branding.version }}">{% endif %}
+<link rel="stylesheet" href="{% static 'web/vendor/tabler-icons.min.css' %}">
+<link rel="stylesheet" href="{% static 'web/app.css' %}">
+<style>:root { --brand: {{ shell.branding.brand_color }}; --on-brand: {{ shell.branding.text_on_brand }}; }</style>
+<script src="{% static 'web/vendor/htmx.min.js' %}" defer></script>
+<script src="{% static 'web/app.js' %}" defer></script>
+</head>
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+{% block body %}
+<div class="app">
+  {% include "web/_sidebar.html" %}
+  <main class="main">
+    <div class="top">
+      <div class="crumb">{% block crumb %}{% endblock %}</div>
+      <div class="grow"></div>
+      <button class="icon-btn" type="button" data-theme-toggle title="Trocar o tema" aria-label="Trocar o tema"><i class="ti ti-contrast-2" aria-hidden="true"></i></button>
+      <div class="who"><i class="av">{% if user.first_name %}{{ user.first_name|first }}{{ user.last_name|first }}{% else %}{{ user.get_username|slice:":2" }}{% endif %}</i>{{ user.get_full_name|default:user.get_username }}</div>
+      <form class="inline-form" method="post" action="{% url 'logout' %}">{% csrf_token %}
+        <button class="icon-btn" type="submit" title="Sair" aria-label="Sair"><i class="ti ti-logout" aria-hidden="true"></i></button>
+      </form>
+    </div>
+    {% for message in messages %}<div class="notice{% if message.level_tag == 'error' %} error{% endif %}" role="status">{{ message }}</div>{% endfor %}
+    {% block content %}{% endblock %}
+  </main>
+</div>
+{% endblock %}
+</body>
+</html>

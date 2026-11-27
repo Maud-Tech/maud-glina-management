@@ -1,0 +1,9 @@
+<aside class="side">
+  {% include "web/_wordmark.html" %}
+  {% for group in shell.menu %}
+    <div class="kicker">{{ group.label }}</div>
+    <nav class="nav">
+      {% for item in group.items %}<a href="{% url item.url_name %}"{% if item.active %} class="on" aria-current="page"{% endif %}>{{ item.label }}</a>{% endfor %}
+    </nav>
+  {% endfor %}
+</aside>

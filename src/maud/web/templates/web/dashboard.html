@@ -1,0 +1,15 @@
+{% extends "web/base.html" %}
+{% block title %}Painel{% endblock %}
+{% block crumb %}<span>Painel</span>{% endblock %}
+{% block content %}
+<h1>Olá, <mark>{{ user.first_name|default:user.get_username }}</mark>.</h1>
+<p class="lead">Este é o painel{% if shell.branding.name %} da {{ shell.branding.name }}{% endif %}. Os números aparecem aqui quando houver apólices cadastradas.</p>
+
+<div class="steps-list">
+  <div class="kicker" style="margin-bottom:10px">Primeiros passos</div>
+  <div class="it"><small>01</small><div><b>Personalizar a gestora</b><span>Nome, logotipo e cor que aparecem em todas as telas.</span></div>
+    {% if perms.branding.change_branding %}<a class="link" href="{% url 'branding_settings' %}">Abrir</a>{% else %}<span class="soon">Só administrador</span>{% endif %}</div>
+  <div class="it"><small>02</small><div><b>Cadastrar entidades</b><span>Emissores, gestores e custodiantes.</span></div><span class="soon">Em breve</span></div>
+  <div class="it"><small>03</small><div><b>Cadastrar ativos</b><span>Caixa, renda variável, dívida, fundos.</span></div><span class="soon">Em breve</span></div>
+</div>
+{% endblock %}

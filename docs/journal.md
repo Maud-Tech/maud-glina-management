@@ -15,6 +15,24 @@ Modelo:
 
 ---
 
+## 2026-11-27 · projeto, web, branding · portas no .env, logotipo maior, nome opcional
+- **O que mudou:** o `docker-compose.yml` não tem mais porta escrita: Postgres e API escutam nas portas do `.env` (`POSTGRES_PORT`, `API_PORT`), iguais dentro e fora do container; usuário, senha e banco também vêm do `.env`. API passou para a porta 8080. O banco só aceita conexão da própria máquina. Na tela: logotipo na proporção da imagem (56px de altura), destaque do título sem invadir a linha de cima, nome da gestora opcional (só o logotipo, ou o nome padrão se também não houver logotipo).
+- **Por quê:** vai rodar na máquina que já tem mcore (5433) e fidccopobras (5431); ajustes pedidos pelo Walter ao ver as telas rodando.
+- **Pendente / atenção:** `.env` de quem já tinha precisa de `API_PORT=8080`. No servidor, colocar o nome ou IP de acesso em `DJANGO_ALLOWED_HOSTS` e, se o acesso for por https via proxy, o endereço em `DJANGO_CSRF_TRUSTED_ORIGINS` (variável nova).
+- **Autor:** Walter (+ IA)
+
+## 2026-11-26 · web, branding · casca das telas e Personalização
+- **O que mudou:** criada a casca das telas (`src/maud/web/`): layout do protótipo aprovado, menu por permissão, entrar e sair, painel com os primeiros passos, tema claro e escuro por pessoa. Criado o módulo `branding` com a tela de Personalização (nome, cor, logotipo, ícone da aba), que muda todas as telas, inclusive a de entrar. Arquivos enviados vão para o storage padrão (pasta `media/`, volume no Docker). htmx, fonte Jost e ícones servidos pelo próprio app. Pacote novo: `pillow`.
+- **Por quê:** ADR 0010: app white label, toda a operação por tela.
+- **Pendente / atenção:** **gerar e aplicar a migration do `branding`** (`makemigrations branding` + `migrate`) antes de abrir as telas. Testes com banco não rodaram na máquina de quem entregou (sem Postgres); conferir no CI. Limites escolhidos sem combinar: imagem até 2 MB, contraste mínimo 4,5:1 (padrão WCAG AA). Painel ainda sem números: entram com apólices.
+- **Autor:** Walter (+ IA)
+
+## 2026-11-26 · projeto · telas white label: decisão, padrão visual e protótipo
+- **O que mudou:** decidido que o app é white label, uma instalação por gestora, com toda a operação por tela em Django + htmx ([ADR 0010](adr/0010-web-screens-white-label.md)). Padrão visual em `docs/ui.md`; protótipos do cadastro de ativo (`docs/ui/asset-form.html`, aprovado) e do painel (`docs/ui/dashboard.html`).
+- **Por quê:** pedido do Walter: gestoras vão operar as apólices pelo app, com o logotipo e as cores delas, e todo cadastro tem de ser feito pela tela.
+- **Pendente / atenção:** a casca (`src/maud/web/`), o módulo `branding` e o storage (`media/`) ainda não existem. As telas de cadastro dependem das slices de `entities` e `assets`. Escolha da biblioteca de gráficos fica para a primeira tela com gráfico.
+- **Autor:** Walter (+ IA)
+
 ## 2026-11-26 · projeto · whitenoise serve os arquivos estáticos
 - **O que mudou:** o `whitenoise` (middleware logo depois do `SecurityMiddleware`) serve o `staticfiles/` que o `collectstatic` gera no build, comprimido. O admin abre com CSS em produção, sem nginx.
 - **Por quê:** o gunicorn não serve arquivo estático.

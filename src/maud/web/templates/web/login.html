@@ -1,0 +1,28 @@
+{% extends "web/base.html" %}
+{% block title %}Entrar{% endblock %}
+{% block body %}
+<div class="login">
+  <section class="login-art">
+    <div class="login-top">
+      {% include "web/_wordmark.html" %}
+      <div class="grow"></div>
+      <button class="icon-btn" type="button" data-theme-toggle title="Trocar o tema" aria-label="Trocar o tema"><i class="ti ti-contrast-2" aria-hidden="true"></i></button>
+    </div>
+    <h1>Gestão de <mark>apólices</mark>.</h1>
+    <p class="lead">Cadastros, conferência com a custódia, fechamentos e pendências, num lugar só.</p>
+  </section>
+  <section class="login-form">
+    <h2>Entrar</h2>
+    <p>Use o usuário e a senha que a {{ shell.branding.name|default:"gestora" }} te passou.</p>
+    <form method="post" novalidate>{% csrf_token %}
+      <input type="hidden" name="next" value="{{ next }}">
+      {% if form.non_field_errors %}<div class="notice error" style="margin:0 0 20px">Usuário ou senha não conferem.</div>{% endif %}
+      <div class="f"><label for="id_username">Usuário</label>
+        <input class="in" id="id_username" name="username" value="{{ form.username.value|default:'' }}" autocomplete="username" autofocus required></div>
+      <div class="f"><label for="id_password">Senha</label>
+        <input class="in" id="id_password" name="password" type="password" autocomplete="current-password" required></div>
+      <button class="btn primary" type="submit">Entrar <i class="ti ti-arrow-right" aria-hidden="true"></i></button>
+    </form>
+  </section>
+</div>
+{% endblock %}

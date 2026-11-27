@@ -1,0 +1,4 @@
+<a class="wordmark" href="{% url 'dashboard' %}">
+  <span class="mark{% if shell.branding.has_logo %} has-logo{% endif %}">{% if shell.branding.has_logo %}<img src="{% url 'branding_image' 'logo' %}?v={{ shell.branding.version }}" alt="">{% else %}{{ shell.branding.initials }}{% endif %}</span>
+  {% if shell.branding.wordmark_name %}<b>{{ shell.branding.wordmark_name }}</b>{% endif %}
+</a>

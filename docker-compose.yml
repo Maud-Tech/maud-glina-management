@@ -1,43 +1,48 @@
-# Ambiente local. Valores abaixo são SÓ de desenvolvimento.
+# Portas, banco, usuário e senha vêm TODOS do .env (copie o .env.example). Nada de porta repetida aqui.
+# Mesma porta dentro e fora do container: o Postgres escuta em POSTGRES_PORT e a API em API_PORT,
+# então o runserver na máquina e os containers usam o mesmo .env; só o host muda (localhost x db).
+# Na máquina que já roda mcore (5433) e fidccopobras (5431), use portas livres no .env.
+
+x-app: &app
+  build: .
+  env_file: .env
+  environment:
+    POSTGRES_HOST: db # dentro da rede do compose o banco se chama "db"; a porta é a do .env
+
 services:
   db:
     image: postgres:16
     environment:
-      POSTGRES_USER: maud
-      POSTGRES_PASSWORD: maud
-      POSTGRES_DB: ${POSTGRES_DB:-maud_glina_management}
+      POSTGRES_USER: ${POSTGRES_USER:?defina POSTGRES_USER no .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD no .env}
+      POSTGRES_DB: ${POSTGRES_DB:?defina POSTGRES_DB no .env}
+      PGPORT: ${POSTGRES_PORT:?defina POSTGRES_PORT no .env} # o Postgres escuta nesta porta
     ports:
-      - "${POSTGRES_PORT:-5435}:5432" # porta do .env; cada repositório da arquitetura Glina usa uma
+      - "127.0.0.1:${POSTGRES_PORT}:${POSTGRES_PORT}" # só a própria máquina: banco sem rota de fora
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U maud -d $${POSTGRES_DB:-maud_glina_management}"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 2s
       timeout: 3s
       retries: 30
 
   # Roda uma vez, antes da API e do Worker, com as migrations que vieram na imagem.
   migrate:
-    build: .
+    <<: *app
     command: python manage.py migrate --noinput
-    env_file: .env
-    environment:
-      POSTGRES_HOST: db
-      POSTGRES_PORT: "5432"
+    restart: "no"
     depends_on:
       db:
         condition: service_healthy
-    restart: "no"
 
   api:
-    build: .
-    command: gunicorn maud.config.wsgi -b 0.0.0.0:8000 -w 3
-    env_file: .env
-    environment:
-      POSTGRES_HOST: db
-      POSTGRES_PORT: "5432"
+    <<: *app
+    command: sh -c 'exec gunicorn maud.config.wsgi -b 0.0.0.0:$${API_PORT} -w 3'
     ports:
-      - "8002:8000"
+      - "${API_PORT:?defina API_PORT no .env}:${API_PORT}"
+    volumes:
+      - media:/app/media # arquivos enviados pela tela (ADR 0010); sobrevive ao rebuild
     depends_on:
       db:
         condition: service_healthy
@@ -45,12 +50,8 @@ services:
         condition: service_completed_successfully
 
   worker:
-    build: .
+    <<: *app
     command: python manage.py worker
-    env_file: .env
-    environment:
-      POSTGRES_HOST: db
-      POSTGRES_PORT: "5432"
     depends_on:
       db:
         condition: service_healthy
@@ -59,3 +60,4 @@ services:
 
 volumes:
   pgdata:
+  media:
