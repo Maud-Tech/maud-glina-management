@@ -9,6 +9,9 @@ Os termos já implementados têm nome em inglês definido. Os demais permanecem 
 | Português (negócio) | Código | Definição |
 |---|---|---|
 | App de gestão | este app (`maud-glina-management`) | Sabe o que existe e quanto vale. Não conhece cliente. |
+| Gestora | _a definir_ | Quem usa e opera uma instalação do app (white label). Uma instalação por gestora. |
+| Identidade da gestora | `branding` (módulo) | Nome, logotipo, ícone da aba e cor principal que a gestora escolhe. |
+| Anexo | _a definir_ | Arquivo enviado pela tela (imagem, PDF). Fica no storage padrão do Django. |
 | Apólice | _a definir_ | Tem fechamento por data e versão, e um total conferido. |
 | Conta corrente | _a definir_ | _a definir com o time_ |
 | Ativo | `Asset` | Identidade central de qualquer ativo offshore. |

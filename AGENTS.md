@@ -11,10 +11,11 @@ Três repositórios: `maud-glina-api` (porteiro, AWS), `maud-glina-liability` (a
 - **Não conhece cliente.** Nada de cliente, pedaço, reserva ou venda neste repositório.
 - **Banco próprio.** Nenhuma tabela em comum com outro app. Nenhum banco tem rota de fora.
 - **A API é só de leitura e interna:** fechamento por apólice, data e versão; total conferido; pendências.
+- **White label, uma instalação por gestora** ([ADR 0010](docs/adr/0010-web-screens-white-label.md)). Toda a operação é por tela, em Django + htmx, no padrão de [`docs/ui.md`](docs/ui.md). Todo cadastro tem tela; o admin é só leitura.
 - **Versão publicada nunca é editada.** Reprocessar gera versão nova; a antiga fica gravada.
 - **Falta de informação sai como preliminar**, com as pendências nomeadas, nunca como estimativa escondida.
 
-**Situação:** estrutura inicial. Ainda não há módulo de negócio, só o `example` do boilerplate.
+**Situação:** módulos `entities` e `assets` com os models, ainda sem slices nem telas. A casca das telas (`web/`) e o módulo `branding` (Personalização) existem ([ADR 0010](docs/adr/0010-web-screens-white-label.md)).
 
 ## Mapa (monolito modular; cada pasta tem seu AGENTS.md)
 
@@ -26,17 +27,18 @@ Camadas, de baixo para cima. Um módulo **só importa módulos abaixo dele** e *
 | # | Pasta | Responsável por |
 |---|---|---|
 | 1 | `shared/` | Núcleo: Money, Shares, clock, erros, idempotência, outbox, proteções de banco |
-| 2 | `modules/entities/` | Cadastro mestre de pessoas físicas e jurídicas, países, moedas, endereços e contatos |
-| 3 | `modules/assets/` | Cadastro mestre, classificação, preços e eventos de ativos offshore |
-| 4 | `modules/example/` | **Demonstração** (não é negócio): a forma de um módulo e das slices de referência. Apagar quando existir um módulo real |
-| 5 | `integration/` | Bordas: adapters de parceiros e entrega do outbox (webhook) |
-| 6 | `jobs/`, `config/` | Entrypoints: Worker (agenda) e API/URLs |
+| 2 | `modules/branding/` | Identidade da gestora (white label): nome, cor, logotipo, ícone da aba |
+| 3 | `modules/entities/` | Cadastro mestre de pessoas físicas e jurídicas, países, moedas, endereços e contatos |
+| 4 | `modules/assets/` | Cadastro mestre, classificação, preços e eventos de ativos offshore |
+| 5 | `modules/example/` | **Demonstração** (não é negócio): a forma de um módulo e das slices de referência. Apagar quando existir um módulo real |
+| 6 | `integration/` | Bordas: adapters de parceiros e entrega do outbox (webhook) |
+| 7 | `jobs/`, `web/`, `config/` | Entrypoints: Worker (agenda), telas (casca, login, painel) e API/URLs |
 
 Módulo novo entra nesta tabela, entre `shared/` e `integration/`, na ordem de dependência (skill `new-module`).
 
 ## Anatomia de um módulo
 
-`api.py` (fachada p/ outros módulos) · `router.py` + `routes.py` (rotas HTTP p/ config) · `jobs.py` (jobs p/ Worker) · `domain/` (regras **puras**, sem Django) · `features/<slice>/` (handler, endpoint, schemas, test) · `models.py` · `migrations/` · `admin.py`.
+`api.py` (fachada p/ outros módulos) · `router.py` + `routes.py` (rotas HTTP p/ config) · `pages.py` (telas p/ config) · `jobs.py` (jobs p/ Worker) · `domain/` (regras **puras**, sem Django) · `features/<slice>/` (handler, endpoint, schemas, test) · `models.py` · `migrations/` · `admin.py`.
 **Onde ficam os testes:** na slice, ao lado do handler (`features/<slice>/test_*.py`). Fora de slice (`domain/`, `shared`, `jobs`), numa subpasta `tests/`. Testes transversais em `tests/` na raiz (acceptance, properties, concurrency, architecture).
 **Não há camada de repository:** a slice usa o ORM do próprio módulo direto. Consulta repetida por várias slices do módulo → `<módulo>/queries.py`. Dado de outro módulo → `api.py` dele.
 **Terceiros:** só em `integration/adapters/<parceiro>/`. Módulos de negócio nunca chamam terceiros (ver `src/maud/integration/AGENTS.md`).
@@ -49,6 +51,7 @@ Módulo novo entra nesta tabela, entre `shared/` e `integration/`, na ordem de d
 |---|---|
 | "criar o módulo X" / "um lugar para cuidar de Y" | skill `new-module` |
 | "cadastrar / consultar / calcular / rotina de ..." | skill `new-feature` (cenários antes de código) |
+| tela nova ou mudança visual | protótipo em `docs/ui/` + imagem para o humano aprovar **antes** do código; padrão em `docs/ui.md` |
 | mudar tabela, campo, constraint | skill `new-migration` |
 | falar com um sistema de fora (API, webhook, arquivo) | adapter em `integration/adapters/<parceiro>/` (forma do `webhook/`) + contrato em `docs/contracts/<parceiro>.md` |
 | decisão que vale para o projeto todo | ADR novo em `docs/adr/` (copie `0000-template.md`) |
@@ -88,6 +91,8 @@ Antes de dizer que terminou: **`uv run python scripts/check.py` termina com "Tud
 9. **Uma slice por tarefa.** Feature nova: skill `new-feature` (cenários antes de código).
 10. **Todo nome em inglês; português só em texto livre** (seção abaixo e [ADR 0003](docs/adr/0003-language.md)).
 11. Nada de `datetime.now()` em regra de negócio: use `get_clock().now()`.
+12. **Tela grava só pela slice** (o mesmo `handler`), nunca direto no model. Nada de CSS solto na tela nem de recurso vindo de CDN: tudo sai da casca e do `docs/ui.md`.
+13. **Arquivo enviado vai pelo storage padrão do Django** (hoje `media/`, depois storage de objetos). Nunca monte caminho de arquivo na mão; abrir arquivo exige login (só o logotipo é público).
 
 ## Nomenclatura (ADR 0003)
 

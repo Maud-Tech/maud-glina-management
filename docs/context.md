@@ -26,6 +26,7 @@ Este app não sabe quem lê e nunca chama o leitor. Por isso pode ser vendido so
 ## 4. As peças
 | Peça | O que faz |
 |---|---|
+| Telas (white label) | toda a operação da gestora: cadastros, conferência, fechamentos, pendências, personalização ([ADR 0010](adr/0010-web-screens-white-label.md), [`ui.md`](ui.md)) |
 | API (só leitura, interna) | fechamento por apólice, data e versão; total conferido; pendências |
 | Backend | apólices, contas correntes, ativos; PL por data; oficializa e retifica sem editar versão publicada |
 | Worker | ingere extratos, posições e preços; confere com a custódia; reprocessa gerando versão nova |
@@ -45,10 +46,15 @@ E também:
 
 Elas viram testes em `tests/acceptance/` e `tests/properties/`.
 
+E sobre as telas:
+- Cada gestora tem a sua instalação, com o seu nome, logotipo e cor.
+- Todo cadastro tem tela, e a tela grava pela slice.
+
 ## 6. Fora de escopo
 - Clientes, pedaços, reservas, venda, saldo e posição do cliente: app de passivo.
 - Falar com o sistema da Glina ou com o porteiro.
 - API de escrita para fora: a API deste app é só de leitura e interna.
+- Várias gestoras na mesma instalação.
 
 ## 7. Fontes
 - Desenho "Arquitetura Glina" (porteiro na AWS + app de passivo + app de gestão), fechado com o time em 26/11/2026.

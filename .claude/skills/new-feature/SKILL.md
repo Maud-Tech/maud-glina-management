@@ -30,6 +30,8 @@ src/maud/modules/<módulo>/features/<verbo_substantivo>/
     handler.py        # docstring: o que faz, invariantes, idempotência, evento, erros
     schemas.py        # entrada/saída (ninja.Schema)
     endpoint.py       # só se exposta via HTTP
+    page.py           # tela (ADR 0010): cadastro sempre tem; chama o mesmo handler
+    page.html         # usa os componentes da casca (docs/ui.md); sem CSS solto
     test_<nome>.py
     SPEC.md           # só se tiver máquina de estados ou cálculo denso
 ```
@@ -49,6 +51,7 @@ Convenção de nomes: a entrada é uma dataclass `<Acao>Command` (comando) ou `<
 - Endpoint: no `endpoint.py`, `from maud.modules.<módulo>.router import router` e `@router.post(...)` / `@router.get(...)` direto; em `src/maud/modules/<módulo>/routes.py`, uma linha importando o endpoint (e o módulo em `config/api.py` se for o primeiro).
 - Job: exponha em `src/maud/modules/<módulo>/jobs.py` e agende em `src/maud/jobs/schedule.py`.
 - Fachada: se outro módulo precisa, exponha em `api.py` (mudança de contrato: avise o humano).
+- Tela: antes do código, protótipo em `docs/ui/` e imagem para o humano aprovar. Depois: `page.py` + `page.html` (forma de `modules/branding/features/update_branding/`), uma linha no `pages.py` do módulo (e o `include` no `config/urls.py` se for a primeira tela do módulo), item em `src/maud/web/navigation.py` e permissão (quem abre, quem grava).
 - Atualize a lista de slices no `AGENTS.md` do módulo (1 linha).
 
 ## 6. Pronto quando
@@ -58,4 +61,4 @@ Convenção de nomes: a entrada é uma dataclass `<Acao>Command` (comando) ou `<
 4. Lista de slices do `AGENTS.md` do módulo atualizada.
 5. Entrada nova no topo de `docs/journal.md`, seguindo o modelo do arquivo.
 6. Mensagem de commit sugerida no formato `<módulo>: <o que mudou>`.
-7. Se tocou em parte sensível (`shared/`, `api.py`, migrations, `tests/acceptance`, `docs/contracts`, instruções de agentes), lembre o humano de avisar o time.
+7. Se tocou em parte sensível (`shared/`, `api.py`, `models.py`, `tests/acceptance`, `docs/contracts`, instruções de agentes), lembre o humano de avisar o time.
