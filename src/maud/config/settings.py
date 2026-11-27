@@ -24,7 +24,11 @@ def _load_dotenv(path: Path) -> None:
         if not line or line.startswith("#") or "=" not in line:
             continue
         name, _, value = line.partition("=")
-        os.environ.setdefault(name.strip(), value.strip())
+        value = value.strip()
+        # Aspas em volta saem, como faz o docker compose: o mesmo .env vale nos dois lados.
+        if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
+            value = value[1:-1]
+        os.environ.setdefault(name.strip(), value)
 
 
 _load_dotenv(BASE_DIR / ".env")
