@@ -12,7 +12,20 @@ Os termos já implementados têm nome em inglês definido. Os demais permanecem 
 | Gestora | _a definir_ | Quem usa e opera uma instalação do app (white label). Uma instalação por gestora. |
 | Identidade da gestora | `branding` (módulo) | Nome, logotipo, ícone da aba e cor principal que a gestora escolhe. |
 | Anexo | _a definir_ | Arquivo enviado pela tela (imagem, PDF). Fica no storage padrão do Django. |
-| Apólice | _a definir_ | Tem fechamento por data e versão, e um total conferido. |
+| Apólice | `Policy` | Seguro feito com a seguradora para um produto (1:1 por enquanto). Tem vigência, status (`ACTIVE`, `EXPIRED`) e, mais adiante, fechamento por data e versão e um total conferido. |
+| Seguradora | `insurer_entity` | Papel de uma `Entity` jurídica (`entity_kind = COMPANY`) na apólice. Aponta para `Entity`, nunca para `EntityCompany`. |
+| Vigência | `effective_from` / `effective_until` | Período em que a apólice (ou a versão do regulamento) vale. O fim é opcional e inclusivo. |
+| Produto | `Product` | O que a Glina mostra na vitrine. Tem código, moeda-base (USD por padrão) e status. |
+| Status do produto | `DRAFT` · `ACTIVE` · `INACTIVE` · `EXPIRED` · `CLOSED` | Rascunho, ativo, inativo (não recebe entradas), expirado (junto com a apólice) e encerrado (final). |
+| Regulamento (apelido: mandato) | `Mandate` | Regras do produto, como um IPS: nível de risco, retorno-alvo, liquidez, prazo médio máximo, classes elegíveis, entrada e saída. Tem versões; versão publicada nunca muda e vale para todos, inclusive quem já comprou. |
+| Versão do regulamento | `Mandate.version` | 1, 2, 3… por produto. Um rascunho por vez; publicar dá número e data de vigência. |
+| Nível de risco | `risk_level` | Escala de 1 (menor risco) a 5. |
+| Retorno-alvo | `target_return_benchmark` + `target_return_spread_pct` | Benchmark (hoje só SOFR) mais um spread em % ao ano. |
+| Prazo médio máximo | `max_average_term_years` | Teto, em anos, do prazo médio da carteira da apólice. O prazo médio em si é calculado da carteira. |
+| Limite de exposição | `ExposureLimit` | Mínimo e máximo em % do PL por classe de ativo, emissor, ativo único, país ou moeda. Pertence a uma versão do regulamento. |
+| Documento do produto | `ProductDocument` | PDF ligado ao produto (e, se for o caso, à apólice): regulamento, lâmina, contrato. Arquivado, nunca apagado. |
+| Histórico do produto | `ProductChange` | Linha append-only por alteração em produto, apólice ou documento: quem, quando, antes e depois, motivo. |
+| Histórico do regulamento | `MandateChange` | Linha append-only por alteração no regulamento ou nos seus limites, do rascunho à publicação. |
 | Conta corrente | _a definir_ | _a definir com o time_ |
 | Ativo | `Asset` | Identidade central de qualquer ativo offshore. |
 | Movimento | _a definir_ | _a definir com o time_ |

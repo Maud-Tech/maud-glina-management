@@ -68,6 +68,7 @@ INSTALLED_APPS = [
     "maud.modules.branding",
     "maud.modules.entities",
     "maud.modules.assets",
+    "maud.modules.products",
     "maud.modules.example",
     "maud.web",  # telas (ADR 0010): casca, login, painel
     "maud.jobs",

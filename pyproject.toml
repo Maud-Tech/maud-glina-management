@@ -91,6 +91,7 @@ layers = [
     "maud.jobs",
     "maud.integration",
     "maud.modules.example",
+    "maud.modules.products",
     "maud.modules.assets",
     "maud.modules.entities",
     "maud.modules.branding",
@@ -102,6 +103,7 @@ name = "domain/ é puro: não importa Django nem Ninja"
 type = "forbidden"
 source_modules = [
     "maud.modules.example.domain",
+    "maud.modules.products.domain",
     "maud.modules.assets.domain",
     "maud.modules.entities.domain",
     "maud.modules.branding.domain",
@@ -113,34 +115,41 @@ forbidden_modules = ["django", "ninja", "psycopg"]
 [[tool.importlinter.contracts]]
 name = "Internas de example são privadas"
 type = "forbidden"
-source_modules = ["maud.config", "maud.web", "maud.jobs", "maud.integration", "maud.modules.assets", "maud.modules.entities", "maud.modules.branding"]
+source_modules = ["maud.config", "maud.web", "maud.jobs", "maud.integration", "maud.modules.assets", "maud.modules.products", "maud.modules.entities", "maud.modules.branding"]
 forbidden_modules = ["maud.modules.example.features", "maud.modules.example.domain", "maud.modules.example.models"]
 allow_indirect_imports = true
 
 [[tool.importlinter.contracts]]
 name = "Internas de assets são privadas"
 type = "forbidden"
-source_modules = ["maud.config", "maud.web", "maud.jobs", "maud.integration", "maud.modules.example", "maud.modules.entities", "maud.modules.branding"]
+source_modules = ["maud.config", "maud.web", "maud.jobs", "maud.integration", "maud.modules.example", "maud.modules.products", "maud.modules.entities", "maud.modules.branding"]
 forbidden_modules = ["maud.modules.assets.features", "maud.modules.assets.domain", "maud.modules.assets.models"]
 allow_indirect_imports = true
 
 [[tool.importlinter.contracts]]
 name = "Internas de entities são privadas"
 type = "forbidden"
-source_modules = ["maud.config", "maud.web", "maud.jobs", "maud.integration", "maud.modules.example", "maud.modules.assets", "maud.modules.branding"]
+source_modules = ["maud.config", "maud.web", "maud.jobs", "maud.integration", "maud.modules.example", "maud.modules.products", "maud.modules.assets", "maud.modules.branding"]
 forbidden_modules = ["maud.modules.entities.features", "maud.modules.entities.domain", "maud.modules.entities.models"]
 allow_indirect_imports = true
 
 [[tool.importlinter.contracts]]
 name = "Internas de branding são privadas"
 type = "forbidden"
-source_modules = ["maud.config", "maud.web", "maud.jobs", "maud.integration", "maud.modules.example", "maud.modules.assets", "maud.modules.entities"]
+source_modules = ["maud.config", "maud.web", "maud.jobs", "maud.integration", "maud.modules.example", "maud.modules.products", "maud.modules.assets", "maud.modules.entities"]
 forbidden_modules = ["maud.modules.branding.features", "maud.modules.branding.domain", "maud.modules.branding.models"]
+allow_indirect_imports = true
+
+[[tool.importlinter.contracts]]
+name = "Internas de products são privadas"
+type = "forbidden"
+source_modules = ["maud.config", "maud.web", "maud.jobs", "maud.integration", "maud.modules.example", "maud.modules.assets", "maud.modules.entities", "maud.modules.branding"]
+forbidden_modules = ["maud.modules.products.features", "maud.modules.products.domain", "maud.modules.products.models"]
 allow_indirect_imports = true
 
 [[tool.importlinter.contracts]]
 name = "Internas de integration são privadas"
 type = "forbidden"
-source_modules = ["maud.config", "maud.web", "maud.jobs", "maud.modules.example", "maud.modules.assets", "maud.modules.entities", "maud.modules.branding"]
+source_modules = ["maud.config", "maud.web", "maud.jobs", "maud.modules.example", "maud.modules.products", "maud.modules.assets", "maud.modules.entities", "maud.modules.branding"]
 forbidden_modules = ["maud.integration.features", "maud.integration.adapters"]
 allow_indirect_imports = true

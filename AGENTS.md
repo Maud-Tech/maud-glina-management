@@ -32,9 +32,10 @@ Camadas, de baixo para cima. Um módulo **só importa módulos abaixo dele** e *
 | 2 | `modules/branding/` | Identidade da gestora (white label): nome, cor, logotipo, ícone da aba |
 | 3 | `modules/entities/` | Cadastro mestre de pessoas físicas e jurídicas, países, moedas, endereços e contatos |
 | 4 | `modules/assets/` | Cadastro mestre, classificação, preços e eventos de ativos offshore |
-| 5 | `modules/example/` | **Demonstração** (não é negócio): a forma de um módulo e das slices de referência. Apagar quando existir um módulo real |
-| 6 | `integration/` | Bordas: adapters de parceiros e entrega do outbox (webhook) |
-| 7 | `jobs/`, `web/`, `config/` | Entrypoints: Worker (agenda), telas (casca, login, painel) e API/URLs |
+| 5 | `modules/products/` | Produtos da vitrine, regulamento (mandato) com versões e limites, apólices, documentos e histórico |
+| 6 | `modules/example/` | **Demonstração** (não é negócio): a forma de um módulo e das slices de referência. Apagar quando existir um módulo real |
+| 7 | `integration/` | Bordas: adapters de parceiros e entrega do outbox (webhook) |
+| 8 | `jobs/`, `web/`, `config/` | Entrypoints: Worker (agenda), telas (casca, login, painel) e API/URLs |
 
 Módulo novo entra nesta tabela, entre `shared/` e `integration/`, na ordem de dependência (skill `new-module`).
 
