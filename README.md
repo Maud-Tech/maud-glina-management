@@ -60,6 +60,15 @@ Tudo em containers: `docker compose up --build` (telas e API na porta `API_PORT`
 
 **Build e migrations.** Migration não vai para o git, mas vai na imagem: o build copia as que estão na pasta do projeto e falha se algum model mudou sem migration gerada. Antes do build, gere na sua máquina (`uv run python manage.py makemigrations`). O serviço `migrate` aplica as migrations antes da API e do Worker subirem; o `collectstatic` roda no build. **No servidor, faça o build sempre na mesma pasta** (`git pull` nela): um clone novo não tem as migrations que o banco de lá já aplicou.
 
+**Servidor sem `uv`.** O `requirements.txt` tem as mesmas versões do `uv.lock` (só produção) e serve para gerar as migrations fora do container com pip (Python 3.12 ou mais novo):
+
+```
+python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+.venv/bin/python manage.py makemigrations
+```
+
+O `uv.lock` é a fonte. Mudou dependência: regenere o `requirements.txt` com `uv export --frozen --no-dev --no-hashes --no-emit-project -o requirements.txt` e suba os dois juntos.
+
 Cada repositório da arquitetura usa portas próprias, para os três rodarem lado a lado: porteiro 8000; passivo 8001 e Postgres 5434; gestão 8080 e Postgres 5435.
 
 No Linux/macOS, se o hook não rodar: `chmod +x .githooks/pre-push`.
