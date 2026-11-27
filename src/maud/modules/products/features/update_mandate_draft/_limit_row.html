@@ -1,0 +1,7 @@
+<tr data-row>
+  <td><select class="in" name="limit_dimension" aria-label="Dimensão" data-limit-dimension{% if not can_save %} disabled{% endif %}>{% for value, label in dimensions %}<option value="{{ value }}"{% if row.dimension == value %} selected{% endif %}>{{ label }}</option>{% endfor %}</select></td>
+  <td><select class="in" name="limit_target" aria-label="Alvo" data-limit-target{% if not can_save %} disabled{% endif %}>{% for dimension, label, options in target_groups %}<optgroup label="{{ label }}" data-dimension="{{ dimension }}">{% if dimension == "SINGLE_ASSET" %}<option value=""{% if row.dimension == dimension %} selected{% endif %}>Qualquer ativo</option>{% endif %}{% for value, option_label in options %}<option value="{{ value }}"{% if row.dimension == dimension and row.target == value %} selected{% endif %}>{{ option_label }}</option>{% endfor %}</optgroup>{% endfor %}</select></td>
+  <td><div class="suffix"><input class="in" name="limit_min" value="{{ row.min|default:'0' }}" inputmode="decimal" aria-label="Mínimo"{% if not can_save %} disabled{% endif %}><em>%</em></div></td>
+  <td><div class="suffix"><input class="in" name="limit_max" value="{{ row.max|default:'' }}" inputmode="decimal" aria-label="Máximo"{% if not can_save %} disabled{% endif %}><em>%</em></div></td>
+  <td>{% if can_save %}<button type="button" class="icon-btn" data-row-remove aria-label="Remover limite" title="Remover limite"><i class="ti ti-x" aria-hidden="true"></i></button>{% endif %}</td>
+</tr>

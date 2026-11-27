@@ -1,0 +1,84 @@
+{% extends "web/base.html" %}
+{% block title %}Regulamento v{{ mandate.version }} · {{ product.code }}{% endblock %}
+{% block crumb %}<a href="{% url 'products_list' %}">Produtos</a> / <a href="{% url 'products_detail' product.id %}?tab=mandate">{{ product.code }}</a> / <span>Regulamento v{{ mandate.version }}{% if draft %} (rascunho){% endif %}</span>{% endblock %}
+{% block content %}
+{% if mode == "view" %}
+{% include "modules/products/_mandate_head.html" %}
+<div class="body"><div>
+  <section class="sec"><div><h2>Perfil e retorno</h2><p class="hint">Risco de 1 (mais conservador) a 5 (mais arrojado). Retorno-alvo: SOFR mais spread ao ano.</p></div>
+    <dl class="kv wide">{% for row in profile %}<dt>{{ row.label }}</dt><dd>{{ row.value }}</dd>{% endfor %}{% if mandate.notes %}<dt>Observações</dt><dd>{{ mandate.notes }}</dd>{% endif %}</dl></section>
+  <section class="sec"><div><h2>Entrada e saída</h2><p class="hint">Sem taxas de entrada ou saída.</p></div>
+    <dl class="kv wide">{% for row in flows %}<dt>{{ row.label }}</dt><dd>{{ row.value }}</dd>{% endfor %}</dl></section>
+  <section class="sec"><div><h2>Limites</h2><p class="hint">Mínimo e máximo em % da carteira.</p></div>
+    {% if limits %}<dl class="kv wide">{% for row in limits %}<dt>{{ row.label }}</dt><dd>{{ row.value }}</dd>{% endfor %}</dl>{% else %}<p class="empty">Sem limites.</p>{% endif %}</section>
+</div>
+{% include "modules/products/_mandate_aside.html" %}
+</div>
+<div class="bar"><span class="note">Versão publicada em {{ mandate.published_at|date:"d/m/Y" }}</span><div class="grow"></div>
+  <a class="btn" href="{% url 'products_detail' product.id %}?tab=mandate">Voltar ao produto</a></div>
+
+{% else %}
+<form method="post" class="registration-form" novalidate>{% csrf_token %}
+{% include "modules/products/_mandate_head.html" %}
+{% include "modules/products/_form_errors.html" %}
+<div class="body"><div>
+{% if step == "profile" %}
+  <section class="sec"><div><h2>Risco</h2><p class="hint">De 1 (mais conservador) a 5 (mais arrojado).</p></div>
+    <div class="f{% if form.risk_level.errors %} bad{% endif %}"><span class="label">Nível de risco <em>*</em></span>
+      <div class="risk" role="radiogroup" aria-label="Nível de risco">{% for value, label in form.fields.risk_level.choices %}<label><input type="radio" name="risk_level" value="{{ value }}"{% if form.risk_level.value|stringformat:"s" == value %} checked{% endif %}{% if not can_save %} disabled{% endif %}><span>{{ label }}</span></label>{% endfor %}</div>
+      {% for error in form.risk_level.errors %}<div class="msg">{{ error }}</div>{% endfor %}
+      {% if was.risk_level %}<div class="changed">Na v{{ previous.version }}: <s>{{ was.risk_level }}</s></div>{% endif %}</div></section>
+  <section class="sec"><div><h2>Retorno-alvo</h2><p class="hint">Referência SOFR mais um spread ao ano.</p></div>
+    <div class="grid">
+      <div class="f"><label for="benchmark">Referência</label><input class="in" id="benchmark" value="SOFR" disabled></div>
+      {% include "modules/products/_field.html" with field=form.target_return_spread_pct label="Spread" required=True suffix="% a.a." was=was.target_return_spread_pct previous_version=previous.version only %}
+    </div></section>
+  <section class="sec"><div><h2>Prazo e liquidez</h2><p class="hint">Prazo médio da carteira, com teto por produto.</p></div>
+    <div class="grid">
+      {% include "modules/products/_field.html" with field=form.liquidity_days label="Liquidez" required=True suffix="dias" was=was.liquidity_days previous_version=previous.version only %}
+      {% include "modules/products/_field.html" with field=form.max_average_term_years label="Prazo médio máximo" required=True suffix="anos" was=was.max_average_term_years previous_version=previous.version only %}
+    </div></section>
+  <section class="sec"><div><h2>Classes elegíveis</h2><p class="hint">Só estas classes podem entrar na carteira. Limite de classe precisa estar aqui.</p></div>
+    <div class="f{% if form.eligible_asset_classes.errors %} bad{% endif %}">
+      <div class="chips">{% for value, label in form.fields.eligible_asset_classes.choices %}<label class="chip"><input type="checkbox" name="eligible_asset_classes" value="{{ value }}"{% if value in form.eligible_asset_classes.value %} checked{% endif %}{% if not can_save %} disabled{% endif %}><i class="ti ti-check" aria-hidden="true"></i>{{ label }}</label>{% endfor %}</div>
+      {% for error in form.eligible_asset_classes.errors %}<div class="msg">{{ error }}</div>{% endfor %}
+      {% if was.eligible_asset_classes %}<div class="changed">Na v{{ previous.version }}: <s>{{ was.eligible_asset_classes }}</s></div>{% endif %}</div></section>
+  <section class="sec"><div><h2>Observações</h2><p class="hint">Texto livre, aparece no regulamento.</p></div>
+    <div class="grid">{% include "modules/products/_field.html" with field=form.notes label="Observações" full=True only %}</div></section>
+{% elif step == "flows" %}
+  <section class="sec"><div><h2>Aplicação</h2><p class="hint">Valores na moeda do produto. Sem taxa de entrada.</p></div>
+    <div class="grid">
+      {% include "modules/products/_field.html" with field=form.min_initial_amount label="Aplicação inicial mínima" required=True prefix=currency was=was.min_initial_amount previous_version=previous.version only %}
+      {% include "modules/products/_field.html" with field=form.min_additional_amount label="Aplicação adicional mínima" prefix=currency was=was.min_additional_amount previous_version=previous.version only %}
+      {% include "modules/products/_field.html" with field=form.subscription_settlement_days label="Liquidação da aplicação" required=True suffix="dias" was=was.subscription_settlement_days previous_version=previous.version only %}
+    </div></section>
+  <section class="sec"><div><h2>Resgate</h2><p class="hint">Sem taxa de saída.</p></div>
+    <div class="grid">
+      {% include "modules/products/_field.html" with field=form.min_redemption_amount label="Resgate mínimo" prefix=currency was=was.min_redemption_amount previous_version=previous.version only %}
+      {% include "modules/products/_field.html" with field=form.min_balance_amount label="Saldo mínimo" prefix=currency was=was.min_balance_amount previous_version=previous.version only %}
+      {% include "modules/products/_field.html" with field=form.redemption_notice_days label="Aviso de resgate" suffix="dias" was=was.redemption_notice_days previous_version=previous.version only %}
+      {% include "modules/products/_field.html" with field=form.redemption_settlement_days label="Liquidação do resgate" required=True suffix="dias" was=was.redemption_settlement_days previous_version=previous.version only %}
+      {% include "modules/products/_field.html" with field=form.lock_up_months label="Carência" suffix="meses" was=was.lock_up_months previous_version=previous.version only %}
+    </div></section>
+{% else %}
+  <section class="sec"><div><h2>Limites</h2><p class="hint">Mínimo e máximo em % da carteira, um por dimensão e alvo. Ativo único vale para qualquer ativo.</p></div>
+    <div class="f{% if limits_error %} bad{% endif %}" data-rows-group>
+      <table class="limits"><thead><tr><th scope="col">Dimensão</th><th scope="col">Alvo</th><th scope="col">Mínimo</th><th scope="col">Máximo</th><th scope="col" aria-label="Remover"></th></tr></thead>
+        <tbody data-rows>{% for row in limit_rows %}{% include "modules/products/features/update_mandate_draft/_limit_row.html" with row=row target_groups=target_groups dimensions=dimensions can_save=can_save only %}{% endfor %}</tbody></table>
+      <template data-row-template>{% include "modules/products/features/update_mandate_draft/_limit_row.html" with row=None target_groups=target_groups dimensions=dimensions can_save=can_save only %}</template>
+      {% if can_save %}<button type="button" class="add" data-row-add><i class="ti ti-plus" aria-hidden="true"></i>Adicionar limite</button>{% endif %}
+      {% if limits_error %}<div class="msg">{{ limits_error }}</div>{% endif %}
+      {% if previous_limits %}<div class="changed">Na v{{ previous.version }}: {% for row in previous_limits %}{{ row.label }} {{ row.value }}{% if not forloop.last %}; {% endif %}{% endfor %}</div>{% endif %}
+    </div></section>
+{% endif %}
+</div>
+{% include "modules/products/_mandate_aside.html" %}
+</div>
+<div class="bar"><span class="note">Etapa {{ step_number }} de 4 · rascunho</span><div class="grow"></div>
+  <a class="btn" href="{% url 'products_detail' product.id %}?tab=mandate">Sair</a>
+  {% if can_save %}<button class="btn" type="submit" name="go" value="save">Salvar rascunho</button>
+  <button class="btn primary" type="submit" name="go" value="next">Salvar e continuar <i class="ti ti-arrow-right" aria-hidden="true"></i></button>{% endif %}
+</div>
+</form>
+{% endif %}
+{% endblock %}

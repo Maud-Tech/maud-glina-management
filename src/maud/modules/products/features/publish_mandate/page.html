@@ -1,0 +1,31 @@
+{% extends "web/base.html" %}
+{% block title %}Publicar v{{ mandate.version }} · {{ product.code }}{% endblock %}
+{% block crumb %}<a href="{% url 'products_list' %}">Produtos</a> / <a href="{% url 'products_detail' product.id %}?tab=mandate">{{ product.code }}</a> / <span>Regulamento v{{ mandate.version }} (rascunho)</span>{% endblock %}
+{% block content %}
+<form method="post" class="registration-form" id="publish-form" novalidate>{% csrf_token %}
+{% include "modules/products/_mandate_head.html" %}
+{% include "modules/products/_form_errors.html" %}
+<div class="body"><div>
+  <section class="sec"><div><h2>Vigência</h2><p class="hint">A partir desta data a versão vale para todos os clientes, inclusive quem já comprou.{% if previous %} Tem de ser depois da v{{ previous.version }} ({{ previous.effective_from|date:"d/m/Y" }}).{% endif %}</p></div>
+    <div class="grid">{% include "modules/products/_field.html" with field=form.effective_from label="Em vigor a partir de" required=True only %}</div></section>
+  <section class="sec"><div><h2>Motivo</h2><p class="hint">{% if reason_required %}Obrigatório a partir da v2.{% else %}Opcional na primeira versão.{% endif %} Fica no histórico e aparece na lista de versões.</p></div>
+    <div class="grid">{% include "modules/products/_field.html" with field=form.reason label="Por que esta versão?" required=reason_required full=True only %}</div></section>
+  {% if previous %}
+  <section class="sec"><div><h2>O que muda</h2><p class="hint">Comparado com a v{{ previous.version }}.</p></div>
+    <div>{% if changes %}<ul class="diff">{% for line in changes %}<li>{{ line }}</li>{% endfor %}</ul>{% else %}<p class="empty">Nada muda em relação à v{{ previous.version }}.</p>{% endif %}</div></section>
+  {% endif %}
+</div>
+{% include "modules/products/_mandate_aside.html" %}
+</div>
+<div class="bar"><span class="note">Etapa 4 de 4 · rascunho</span><div class="grow"></div>
+  <a class="btn" href="{% url 'products_detail' product.id %}?tab=mandate">Sair</a>
+  <a class="btn" href="{% url 'products_mandate' product.id mandate.id %}?step=limits"><i class="ti ti-arrow-left" aria-hidden="true"></i>Voltar</a>
+  <button class="btn primary" type="submit" data-dialog="publish-confirm"{% if missing %} disabled title="Falta preencher: {{ missing|join:', ' }}"{% endif %}>Publicar v{{ mandate.version }}</button>
+</div>
+<dialog class="confirm" id="publish-confirm" aria-labelledby="publish-confirm-title">
+  <h2 id="publish-confirm-title">Publicar a v{{ mandate.version }}?</h2>
+  <p>Na data de vigência, a v{{ mandate.version }} passa a valer para todos os clientes do {{ product.code }}, inclusive quem já comprou. Depois de publicada, a versão não muda: para corrigir, abra uma versão nova.</p>
+  <div class="actions"><button type="button" class="btn" data-dialog-close>Cancelar</button><button type="submit" class="btn primary">Publicar</button></div>
+</dialog>
+</form>
+{% endblock %}

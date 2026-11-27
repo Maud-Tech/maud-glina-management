@@ -13,6 +13,15 @@ class MenuItem:
     label: str
     url_name: str
     permission: str | None = None
+    # Telas sem item próprio que marcam este item (ex.: "products_" cobre detalhe e formulários)
+    covers_prefix: str | None = None
+
+    def is_current(self, current: str | None) -> bool:
+        if current is None:
+            return False
+        return self.url_name == current or (
+            self.covers_prefix is not None and current.startswith(self.covers_prefix)
+        )
 
 
 @dataclass(frozen=True)
@@ -23,6 +32,17 @@ class MenuGroup:
 
 MENU = (
     MenuGroup("Carteira", (MenuItem("Painel", "dashboard"),)),
+    MenuGroup(
+        "Produtos",
+        (
+            MenuItem(
+                "Cadastro de produtos",
+                "products_list",
+                "products.view_product",
+                covers_prefix="products_",
+            ),
+        ),
+    ),
     MenuGroup(
         "Pessoas e entidades",
         (
@@ -83,7 +103,7 @@ def menu_for(request: HttpRequest) -> tuple[VisibleGroup, ...]:
     groups = []
     for group in MENU:
         items = tuple(
-            VisibleItem(item.label, item.url_name, active=item.url_name == current)
+            VisibleItem(item.label, item.url_name, active=item.is_current(current))
             for item in group.items
             if item.permission is None or user.has_perm(item.permission)
         )

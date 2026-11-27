@@ -3,7 +3,10 @@
 > Como as telas são feitas e como devem parecer. Decisão em [ADR 0010](adr/0010-web-screens-white-label.md).
 > Protótipos de referência (abra no navegador): cadastro [`ui/asset-form.html`](ui/asset-form.html) e painel [`ui/dashboard.html`](ui/dashboard.html). As imagens (`*-dark.png`, `*-light.png`) ficam ao lado.
 
-**Situação:** a casca, a Personalização e os cadastros de `entities` e `assets` existem.
+**Situação:** a casca, a Personalização, os cadastros de `entities` e `assets` e as telas de
+`products` existem. Produtos usam detalhe com abas (`.tabs`), números grandes (`.stats`),
+etiqueta de status (`.tag`), linha do tempo do histórico (`.timeline`) e confirmação em
+`<dialog class="confirm">` aberta por `data-dialog` (protótipo `ui/products-preview.html`).
 Cada cadastro separa listagem de formulário: Novo abre a criação; Abrir cadastro exibe
 o detalhe/edição; salvar, cancelar e voltar apontam para a lista do respectivo cadastro.
 Listas têm busca, filtros e paginação. Endereços/contatos e vínculos de ativos também

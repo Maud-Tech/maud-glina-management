@@ -1,0 +1,29 @@
+{% extends "web/base.html" %}
+{% block title %}Produtos{% endblock %}
+{% block crumb %}Produtos / <span>Cadastro de produtos</span>{% endblock %}
+{% block content %}
+<h1>Seus <mark>produtos.</mark></h1>
+<p class="lead">Cada produto tem um regulamento com versões e uma apólice. Abra o produto para ver, editar e acompanhar o histórico.</p>
+<form method="get" class="registration-toolbar">
+  <div class="f"><label for="search">Buscar por código ou nome</label><input class="in" id="search" name="q" value="{{ search }}" placeholder="Digite para buscar"></div>
+  <div class="f"><label for="status">Status</label><select class="in" id="status" name="status"><option value="">Todos</option>{% for value, label in statuses %}<option value="{{ value }}"{% if status == value %} selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+  <button class="btn" type="submit">Filtrar</button>
+  {% if can_add %}<a class="btn primary" href="{% url 'products_new' %}">Novo produto</a>{% endif %}
+</form>
+<div class="registration-table-wrap"><table class="registration-table">
+  <thead><tr><th scope="col">Produto</th><th scope="col">Moeda</th><th scope="col">Status</th><th scope="col">Regulamento</th><th scope="col">Apólice</th><th scope="col">Ação</th></tr></thead>
+  <tbody>{% for row in rows %}<tr>
+    <td>{{ row.item.name }}<small>{{ row.item.code }}</small></td>
+    <td>{{ row.item.base_currency }}</td>
+    <td><span class="tag {{ row.item.status|lower }}">{{ row.status_label }}</span></td>
+    <td>{{ row.mandate }}{% if row.mandate_note %}<small>{{ row.mandate_note }}</small>{% endif %}</td>
+    <td>{{ row.policy }}<small>{{ row.policy_note }}</small></td>
+    <td><a class="link" href="{% url 'products_detail' row.item.id %}">Abrir produto <span aria-hidden="true">→</span></a></td>
+  </tr>{% empty %}<tr><td colspan="6">Nenhum produto encontrado.{% if can_add %} Clique em Novo produto para começar.{% endif %}</td></tr>{% endfor %}</tbody>
+</table></div>
+<nav class="registration-toolbar" aria-label="Paginação">
+  <span class="msg">{{ page.paginator.count }} registros · Página {{ page.number }} de {{ page.paginator.num_pages }}</span><div class="grow"></div>
+  {% if page.has_previous %}<a class="btn" href="?{{ page_query }}&amp;page={{ page.previous_page_number }}">Anterior</a>{% endif %}
+  {% if page.has_next %}<a class="btn" href="?{{ page_query }}&amp;page={{ page.next_page_number }}">Próxima</a>{% endif %}
+</nav>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "web/base.html" %}
+{% block title %}{% if editing %}Editar apólice{% else %}Nova apólice{% endif %} · {{ product.code }}{% endblock %}
+{% block crumb %}<a href="{% url 'products_list' %}">Produtos</a> / <a href="{% url 'products_detail' product.id %}?tab=policy">{{ product.code }}</a> / <span>{% if editing %}Editar apólice{% else %}Nova apólice{% endif %}</span>{% endblock %}
+{% block content %}
+<form method="post" class="registration-form" novalidate>{% csrf_token %}
+<h1>{% if editing %}Editar{% else %}Cadastrar{% endif %} <mark>apólice.</mark></h1>
+<p class="lead">Uma apólice por produto, na moeda do produto. O número não se repete na mesma seguradora.</p>
+{% include "modules/products/_form_errors.html" %}
+<div class="body"><div>
+  <section class="sec"><div><h2>Apólice</h2><p class="hint">A seguradora vem do cadastro de pessoas jurídicas.</p></div>
+    <div class="grid">
+      {% include "modules/products/_field.html" with field=form.policy_number label="Número" required=True only %}
+      {% include "modules/products/_field.html" with field=form.insurer_entity_id label="Seguradora" required=True help="Só pessoas jurídicas aparecem aqui." only %}
+      <div class="f"><label for="policy-currency">Moeda</label><input class="in" id="policy-currency" value="{{ product.base_currency }}" disabled><div class="msg">Igual à moeda base do produto.</div></div>
+      {% include "modules/products/_field.html" with field=form.issue_date label="Emissão" only %}
+    </div></section>
+  <section class="sec"><div><h2>Vigência</h2><p class="hint">O último dia conta como vigente. Sem data final, vale até ser expirada.</p></div>
+    <div class="grid">
+      {% include "modules/products/_field.html" with field=form.effective_from label="Início" required=True only %}
+      {% include "modules/products/_field.html" with field=form.effective_until label="Fim" help="Opcional." only %}
+    </div></section>
+  {% if editing %}
+  <section class="sec"><div><h2>Motivo</h2><p class="hint">Opcional. Fica no histórico.</p></div>
+    <div class="grid">{% include "modules/products/_field.html" with field=form.reason label="Por que está alterando?" full=True only %}</div></section>
+  {% endif %}
+</div>
+<aside class="aside"><div class="quote"><b>{{ product.name }}</b><span>{{ product.code }} · {{ product.base_currency }}</span></div>
+  <ul class="checks"><li><i class="ti ti-info-circle" aria-hidden="true"></i>O produto só pode ser ativado com a apólice vigente hoje.</li></ul></aside>
+</div>
+<div class="bar"><span class="note">{% if editing %}Alteração de apólice{% else %}Apólice nova{% endif %}</span><div class="grow"></div>
+  <a class="btn" href="{% url 'products_detail' product.id %}?tab=policy">Cancelar</a>
+  <button class="btn primary" type="submit">Salvar apólice <i class="ti ti-check" aria-hidden="true"></i></button></div>
+</form>
+{% endblock %}

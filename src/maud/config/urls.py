@@ -22,4 +22,5 @@ urlpatterns = [
     path("", include("maud.modules.branding.pages")),
     path("", include("maud.modules.entities.pages")),
     path("", include("maud.modules.assets.pages")),
+    path("", include("maud.modules.products.pages")),
 ]

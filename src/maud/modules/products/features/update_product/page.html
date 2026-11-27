@@ -1,0 +1,31 @@
+{% extends "web/base.html" %}
+{% block title %}Editar {{ product.code }}{% endblock %}
+{% block crumb %}<a href="{% url 'products_list' %}">Produtos</a> / <a href="{% url 'products_detail' product.id %}">{{ product.code }}</a> / <span>Editar</span>{% endblock %}
+{% block content %}
+<form method="post" class="registration-form" novalidate>{% csrf_token %}
+<h1>Editar <mark>produto.</mark></h1>
+<p class="lead">{% if locked %}Produto {{ status_label|lower }}: código e moeda base estão travados. {% endif %}Toda alteração vai para o histórico, com quem alterou e o motivo.</p>
+{% include "modules/products/_form_errors.html" %}
+<div class="body"><div>
+  <section class="sec"><div><h2>Identificação</h2><p class="hint">Código e moeda só mudam em rascunho. A moeda também não muda depois que há apólice.</p></div>
+    <div class="grid">
+      {% if locked %}{% include "modules/products/_field.html" with field=form.code label="Código" help="Travado depois que o produto sai do rascunho." only %}{% else %}{% include "modules/products/_field.html" with field=form.code label="Código" required=True help="Letras, números e hífen. Único no app." only %}{% endif %}
+      {% include "modules/products/_field.html" with field=form.name label="Nome" required=True only %}
+      {% include "modules/products/_field.html" with field=form.base_currency label="Moeda base" required=True only %}
+      {% include "modules/products/_field.html" with field=form.description label="Descrição" full=True only %}
+    </div></section>
+  <section class="sec"><div><h2>Datas</h2><p class="hint">Opcionais. O encerramento não pode ser antes do lançamento.</p></div>
+    <div class="grid">
+      {% include "modules/products/_field.html" with field=form.launch_date label="Lançamento" only %}
+      {% include "modules/products/_field.html" with field=form.closing_date label="Encerramento" only %}
+    </div></section>
+  <section class="sec"><div><h2>Motivo</h2><p class="hint">Opcional. Fica no histórico, junto com quem alterou.</p></div>
+    <div class="grid">{% include "modules/products/_field.html" with field=form.reason label="Por que está alterando?" full=True only %}</div></section>
+</div>
+<aside class="aside"><div class="quote"><b>{{ product.name }}</b><span>{{ product.code }} · {{ product.base_currency }} · {{ status_label }}</span></div></aside>
+</div>
+<div class="bar"><span class="note">Alteração de produto</span><div class="grow"></div>
+  <a class="btn" href="{% url 'products_detail' product.id %}">Cancelar</a>
+  <button class="btn primary" type="submit">Salvar alterações <i class="ti ti-check" aria-hidden="true"></i></button></div>
+</form>
+{% endblock %}

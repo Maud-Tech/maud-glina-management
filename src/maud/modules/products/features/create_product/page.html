@@ -1,0 +1,34 @@
+{% extends "web/base.html" %}
+{% block title %}Novo produto{% endblock %}
+{% block crumb %}<a href="{% url 'products_list' %}">Produtos</a> / <span>Novo produto</span>{% endblock %}
+{% block content %}
+<form method="post" class="registration-form" novalidate>{% csrf_token %}
+<h1>Novo <mark>produto.</mark></h1>
+<p class="lead">O produto nasce em rascunho. Depois de salvo, você cadastra a apólice e o regulamento e então ativa.</p>
+{% include "modules/products/_form_errors.html" %}
+<div class="body"><div>
+  <section class="sec"><div><h2>Identificação</h2><p class="hint">Código e moeda não mudam depois que o produto sai do rascunho.</p></div>
+    <div class="grid">
+      {% include "modules/products/_field.html" with field=form.code label="Código" required=True help="Letras, números e hífen. Único no app." only %}
+      {% include "modules/products/_field.html" with field=form.name label="Nome" required=True only %}
+      {% include "modules/products/_field.html" with field=form.base_currency label="Moeda base" required=True help="Padrão USD. A apólice segue esta moeda." only %}
+      {% include "modules/products/_field.html" with field=form.description label="Descrição" full=True only %}
+    </div></section>
+  <section class="sec"><div><h2>Datas</h2><p class="hint">Opcionais. O encerramento não pode ser antes do lançamento.</p></div>
+    <div class="grid">
+      {% include "modules/products/_field.html" with field=form.launch_date label="Lançamento" only %}
+      {% include "modules/products/_field.html" with field=form.closing_date label="Encerramento" only %}
+    </div></section>
+</div>
+<aside class="aside"><div class="quote"><b>Rascunho</b><span>Ninguém compra o produto enquanto ele não for ativado.</span></div>
+  <div class="kicker">Para ativar depois</div>
+  <ul class="checks">
+    <li><i class="ti ti-circle-dashed" aria-hidden="true"></i>Apólice cadastrada e vigente</li>
+    <li><i class="ti ti-circle-dashed" aria-hidden="true"></i>Regulamento publicado e em vigor</li>
+  </ul></aside>
+</div>
+<div class="bar"><span class="note">Produto novo, em rascunho</span><div class="grow"></div>
+  <a class="btn" href="{% url 'products_list' %}">Cancelar</a>
+  <button class="btn primary" type="submit">Salvar produto <i class="ti ti-check" aria-hidden="true"></i></button></div>
+</form>
+{% endblock %}

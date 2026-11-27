@@ -1,0 +1,134 @@
+{% extends "web/base.html" %}
+{% block title %}{{ product.code }}{% endblock %}
+{% block crumb %}<a href="{% url 'products_list' %}">Produtos</a> / <span>{{ product.code }}</span>{% endblock %}
+{% block content %}
+<div class="head">
+  <h1>{{ title_start }} <mark>{{ title_last }}.</mark></h1>
+  <div class="actions">
+    {% if can_edit %}<a class="btn small" href="{% url 'products_edit' product.id %}">Editar</a>{% endif %}
+    {% for action in actions %}<button type="button" class="btn small{% if action.primary %} primary{% endif %}" data-dialog="status-{{ action.status|lower }}">{{ action.label }}</button>{% endfor %}
+  </div>
+</div>
+<p class="lead"><span class="tag {{ product.status|lower }}">{{ status_label }}</span> &nbsp; {{ product.code }} · moeda base {{ product.base_currency }}{% if product.status == "EXPIRED" %} · expirou junto com a apólice; agora só pode ser encerrado{% endif %}</p>
+
+<nav class="tabs" aria-label="Partes do produto">{% for key, label in tabs %}<a href="?tab={{ key }}"{% if key == tab %} class="on" aria-current="page"{% endif %}><small>0{{ forloop.counter }}</small>{{ label }}</a>{% endfor %}</nav>
+
+{% if tab == "overview" %}
+<div class="stats">
+  <div class="stat"><span class="kicker">Status</span><b>{{ status_label }}</b><span>{{ product.code }}</span></div>
+  <div class="stat"><span class="kicker">Regulamento vigente</span>{% if detail.current_mandate %}<b>v{{ detail.current_mandate.version }}</b><span>em vigor desde {{ detail.current_mandate.effective_from|date:"d/m/Y" }}</span>{% else %}<b>—</b><span>{% if detail.draft_mandate %}v{{ detail.draft_mandate.version }} em rascunho{% else %}nenhuma versão{% endif %}</span>{% endif %}</div>
+  <div class="stat"><span class="kicker">Apólice</span><b>{{ detail.policy.policy_number|default:"—" }}</b><span>{{ policy_note }}</span></div>
+</div>
+<div class="body"><div>
+  {% if actions %}{% for action in actions %}{% if action.status == "ACTIVE" and action.missing %}
+  <section class="sec"><div><h2>Antes de ativar</h2><p class="hint">O produto só fica ativo com as duas condições abaixo.</p></div>
+    <ul class="checks">
+      {% if "uma apólice ativa e vigente hoje" in action.missing %}<li class="err"><i class="ti ti-alert-circle" aria-hidden="true"></i><span>Falta uma apólice ativa e vigente hoje. <a class="link" href="?tab=policy">Ver apólice →</a></span></li>{% else %}<li class="ok"><i class="ti ti-circle-check" aria-hidden="true"></i>Apólice vigente</li>{% endif %}
+      {% if "o regulamento publicado" in action.missing %}<li class="err"><i class="ti ti-alert-circle" aria-hidden="true"></i><span>Falta publicar o regulamento. <a class="link" href="?tab=mandate">Ver regulamento →</a></span></li>{% else %}<li class="ok"><i class="ti ti-circle-check" aria-hidden="true"></i>Regulamento publicado</li>{% endif %}
+    </ul></section>
+  {% endif %}{% endfor %}{% endif %}
+  {% if detail.current_mandate %}
+  <section class="sec"><div><h2>Perfil</h2><p class="hint">Do regulamento em vigor (v{{ detail.current_mandate.version }}).{% if upcoming_version %} O que muda na v{{ upcoming_version }} aparece marcado.{% endif %}</p></div>
+    <dl class="kv wide">{% for row in profile %}<dt>{{ row.label }}</dt><dd>{{ row.value }}{% if row.other %} <span class="changed">→ {{ row.other }} na v{{ upcoming_version }}</span>{% endif %}</dd>{% endfor %}
+    {% for row in limits %}<dt>{{ row.label }}</dt><dd>{{ row.value }}{% if row.other %} <span class="changed">→ {{ row.other }} na v{{ upcoming_version }}</span>{% endif %}</dd>{% endfor %}</dl></section>
+  <section class="sec"><div><h2>Entrada e saída</h2><p class="hint">Sem taxas de entrada ou saída.</p></div>
+    <dl class="kv wide">{% for row in flows %}<dt>{{ row.label }}</dt><dd>{{ row.value }}{% if row.other %} <span class="changed">→ {{ row.other }} na v{{ upcoming_version }}</span>{% endif %}</dd>{% endfor %}</dl></section>
+  {% else %}
+  <section class="sec"><div><h2>Regulamento</h2><p class="hint">Perfil, entrada e saída e limites aparecem aqui quando houver versão em vigor.</p></div>
+    <div><p class="empty">Nenhuma versão em vigor.</p><a class="link" href="?tab=mandate">Ver regulamento →</a></div></section>
+  {% endif %}
+  <section class="sec"><div><h2>Identificação</h2><p class="hint">Dados do cadastro do produto.</p></div>
+    <dl class="kv wide"><dt>Código</dt><dd>{{ product.code }}</dd><dt>Nome</dt><dd>{{ product.name }}</dd><dt>Moeda base</dt><dd>{{ product.base_currency }}</dd>
+      <dt>Descrição</dt><dd>{{ product.description|default:"—" }}</dd><dt>Lançamento</dt><dd>{{ product.launch_date|date:"d/m/Y"|default:"—" }}</dd><dt>Encerramento</dt><dd>{{ product.closing_date|date:"d/m/Y"|default:"—" }}</dd></dl></section>
+</div>
+<aside class="aside"><div class="quote"><b>{{ product.name }}</b><span>{{ product.code }} · {{ product.base_currency }}</span></div>
+  <dl class="kv"><dt>Seguradora</dt><dd>{{ insurer }}</dd><dt>Documentos</dt><dd>{{ documents_count }}</dd></dl>
+</aside></div>
+
+{% elif tab == "mandate" %}
+<div class="body"><div>
+  <section class="sec"><div><h2>Versões</h2><p class="hint">Versão publicada não muda. Para alterar, abra um rascunho: ele copia a última versão publicada.</p></div>
+    <div>{% if versions %}<ul class="versions">{% for version in versions %}<li><b>v{{ version.version }}</b><div>{{ version.note }}{% if version.reason %}<br><span>“{{ version.reason }}”{% if version.author %} · {{ version.author }}{% endif %}</span>{% elif version.author %}<br><span>{{ version.author }}</span>{% endif %}</div>
+      {% if version.draft %}{% if can_mandate %}<a class="link" href="{% url 'products_mandate' product.id version.id %}">Continuar →</a>{% else %}<a class="link" href="{% url 'products_mandate' product.id version.id %}">Ver →</a>{% endif %}{% else %}<a class="link" href="{% url 'products_mandate' product.id version.id %}">Ver →</a>{% endif %}</li>{% endfor %}</ul>
+      {% else %}<p class="empty">Nenhuma versão ainda.</p>{% endif %}
+      {% if can_start_draft %}<form method="post" action="{% url 'products_mandate_start' product.id %}">{% csrf_token %}<button class="add" type="submit"><i class="ti ti-plus" aria-hidden="true"></i>{% if last_version %}Nova versão (rascunho a partir da v{{ last_version }}){% else %}Começar o regulamento (v1){% endif %}</button></form>{% endif %}
+    </div></section>
+</div>
+<aside class="aside"><div class="quote"><b>Vale para todos</b><span>Quando uma versão entra em vigor, ela vale para todo cliente, inclusive quem já comprou. As anteriores ficam guardadas.</span></div></aside></div>
+
+{% elif tab == "policy" %}
+<div class="body"><div>
+  {% if detail.policy %}
+  <section class="sec"><div><h2>Apólice</h2><p class="hint">Uma por produto, sempre na moeda do produto.</p></div>
+    <div><dl class="kv wide"><dt>Número</dt><dd>{{ detail.policy.policy_number }}</dd><dt>Seguradora</dt><dd>{{ insurer }}</dd><dt>Moeda</dt><dd>{{ detail.policy.currency }}</dd>
+      <dt>Emissão</dt><dd>{{ detail.policy.issue_date|date:"d/m/Y"|default:"—" }}</dd>
+      <dt>Vigência</dt><dd>{{ detail.policy.effective_from|date:"d/m/Y" }}{% if detail.policy.effective_until %} a {{ detail.policy.effective_until|date:"d/m/Y" }}{% else %}, sem data final{% endif %}</dd>
+      <dt>Situação</dt><dd><span class="tag {% if detail.policy.status == 'ACTIVE' %}active{% else %}expired{% endif %}">{{ policy_status_label }}</span></dd></dl>
+      {% if can_change_policy %}<p class="spaced"><a class="btn small" href="{% url 'products_policy_edit' product.id %}">Editar apólice</a></p>{% endif %}</div></section>
+  {% if can_change_policy %}
+  <section class="sec"><div><h2>Expirar</h2><p class="hint">Use quando a seguradora encerrar ou não renovar o contrato.</p></div>
+    <div class="danger-zone"><b>Expirar a apólice expira o produto.</b><p>O produto deixa de estar ativo e, depois disso, só pode ser encerrado. Não dá para desfazer.</p>
+      <button type="button" class="btn small danger" data-dialog="expire-policy">Expirar apólice</button></div></section>
+  <dialog class="confirm" id="expire-policy" aria-labelledby="expire-policy-title">
+    <form method="post" action="{% url 'products_policy_expire' product.id %}">{% csrf_token %}
+      <h2 id="expire-policy-title">Expirar a apólice {{ detail.policy.policy_number }}?</h2>
+      <p>{% if product.status == "ACTIVE" or product.status == "INACTIVE" %}O produto {{ product.code }} passa para Expirado junto e depois só pode ser encerrado. {% endif %}Não dá para desfazer.</p>
+      <div class="f"><label for="expire-reason">Motivo (opcional, fica no histórico)</label><textarea class="in" id="expire-reason" name="reason" rows="2"></textarea></div>
+      <div class="actions"><button type="button" class="btn" data-dialog-close>Cancelar</button><button type="submit" class="btn danger">Expirar apólice{% if product.status == "ACTIVE" or product.status == "INACTIVE" %} e produto{% endif %}</button></div>
+    </form></dialog>
+  {% endif %}
+  {% else %}
+  <section class="sec"><div><h2>Apólice</h2><p class="hint">Uma por produto. A seguradora tem de ser pessoa jurídica.</p></div>
+    <div><p class="empty">Nenhuma apólice cadastrada.</p>{% if can_add_policy %}<a class="btn primary" href="{% url 'products_policy_new' product.id %}">Cadastrar apólice</a>{% endif %}</div></section>
+  {% endif %}
+</div></div>
+
+{% elif tab == "documents" %}
+<div class="body"><div>
+  {% if can_attach %}
+  <section class="sec"><div><h2>Enviar</h2><p class="hint">Só PDF, até 20 MB. O arquivo fica guardado com o produto.</p></div>
+    <form method="post" enctype="multipart/form-data" action="{% url 'products_document_attach' product.id %}" class="grid">{% csrf_token %}
+      <div class="f"><label for="document-type">Tipo <em>*</em></label><select class="in" id="document-type" name="document_type">{% for value, label in document_types %}<option value="{{ value }}">{{ label }}</option>{% endfor %}</select></div>
+      <div class="f"><label for="document-title">Título <em>*</em></label><input class="in" id="document-title" name="title" maxlength="200" placeholder="Ex.: Regulamento v2" required></div>
+      <div class="f full"><label class="drop"><input type="file" name="file" accept="application/pdf" required><i class="ti ti-upload" aria-hidden="true"></i><div>Arraste o PDF aqui ou <span class="link">escolha no computador</span><br><small class="chosen"></small></div></label></div>
+      <div class="f full"><button class="btn primary" type="submit">Enviar documento <i class="ti ti-upload" aria-hidden="true"></i></button></div>
+    </form></section>
+  {% endif %}
+  <section class="sec"><div><h2>Enviados</h2><p class="hint">Documento não é apagado: é arquivado e continua no histórico.</p></div>
+    <div>{% for document in documents %}<div class="file{% if document.archived %} archived{% endif %}"><i class="ti ti-file-type-pdf" aria-hidden="true"></i><span class="grow">{{ document.title }}<span class="meta">{{ document.meta }}</span></span>
+      <a class="link" href="{% url 'products_document_open' product.id document.id %}" target="_blank" rel="noopener">Abrir</a>
+      {% if can_attach and not document.archived %}<button type="button" class="btn small" data-dialog="archive-{{ document.id }}">Arquivar</button>
+      <dialog class="confirm" id="archive-{{ document.id }}" aria-labelledby="archive-{{ document.id }}-title"><form method="post" action="{% url 'products_document_archive' product.id document.id %}">{% csrf_token %}
+        <h2 id="archive-{{ document.id }}-title">Arquivar “{{ document.title }}”?</h2><p>O arquivo continua guardado e no histórico, mas sai da lista de documentos em uso.</p>
+        <div class="f"><label for="archive-reason-{{ document.id }}">Motivo (opcional, fica no histórico)</label><textarea class="in" id="archive-reason-{{ document.id }}" name="reason" rows="2"></textarea></div>
+        <div class="actions"><button type="button" class="btn" data-dialog-close>Cancelar</button><button type="submit" class="btn primary">Arquivar</button></div></form></dialog>{% endif %}
+    </div>{% empty %}<p class="empty">Nenhum documento enviado.</p>{% endfor %}</div></section>
+</div></div>
+
+{% elif tab == "history" %}
+<form method="get" class="registration-toolbar"><input type="hidden" name="tab" value="history">
+  <div class="f"><label for="what">O que mudou</label><select class="in" id="what" name="what">{% for value, label in history_filters %}<option value="{{ value }}"{% if what == value %} selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+  <button class="btn" type="submit">Filtrar</button></form>
+<ul class="timeline">{% for entry in history %}<li><time><b>{{ entry.date }}</b>{{ entry.time }} · {{ entry.who }}</time><div>
+  <div class="what"><small>{{ entry.subject }}</small>{{ entry.action }}</div>
+  <ul class="diff">{% for change in entry.changes %}<li>{{ change.field }}: <s>{{ change.before }}</s> → <b>{{ change.after }}</b></li>{% endfor %}</ul>
+  {% if entry.reason %}<div class="reason">{{ entry.reason }}</div>{% endif %}</div></li>{% empty %}<li><p class="empty">Nada registrado{% if what %} para este filtro{% endif %}.</p></li>{% endfor %}</ul>
+<p class="msg">{{ history|length }} registros · o histórico nunca é apagado nem alterado</p>
+{% endif %}
+
+{% for action in actions %}
+<dialog class="confirm" id="status-{{ action.status|lower }}" aria-labelledby="status-{{ action.status|lower }}-title">
+  {% if action.missing %}
+  <h2 id="status-{{ action.status|lower }}-title">Ainda não dá para ativar</h2>
+  <p>Falta {{ action.missing|join:" e " }}.</p>
+  <div class="actions"><button type="button" class="btn primary" data-dialog-close>Entendi</button></div>
+  {% else %}
+  <form method="post" action="{% url 'products_status' product.id %}">{% csrf_token %}<input type="hidden" name="status" value="{{ action.status }}">
+    <h2 id="status-{{ action.status|lower }}-title">{{ action.title }}</h2><p>{{ action.text }}</p>
+    <div class="f"><label for="status-reason-{{ action.status|lower }}">Motivo (opcional, fica no histórico)</label><textarea class="in" id="status-reason-{{ action.status|lower }}" name="reason" rows="2"></textarea></div>
+    <div class="actions"><button type="button" class="btn" data-dialog-close>Cancelar</button><button type="submit" class="btn {% if action.danger %}danger{% else %}primary{% endif %}">{{ action.confirm }}</button></div>
+  </form>
+  {% endif %}
+</dialog>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,11 @@
+<aside class="aside"><div class="quote"><b>v{{ mandate.version }} · {% if draft %}rascunho{% else %}publicada{% endif %}</b><span>{{ product.code }}{% if previous and draft %} · copiada da v{{ previous.version }}{% endif %}</span></div>
+  <dl class="kv"><dt>Risco</dt><dd>{{ summary.risk }}</dd><dt>Retorno-alvo</dt><dd>{{ summary.target_return }}</dd><dt>Classes elegíveis</dt><dd>{{ summary.classes }}</dd><dt>Limites</dt><dd>{{ summary.limits }}</dd></dl>
+  {% if draft %}
+  <div class="kicker spaced">Para publicar</div>
+  <ul class="checks">
+    {% if missing %}<li class="err"><i class="ti ti-alert-circle" aria-hidden="true"></i><span>Falta preencher: {{ missing|join:", " }}.</span></li>
+    {% else %}<li class="ok"><i class="ti ti-circle-check" aria-hidden="true"></i>Campos obrigatórios preenchidos</li>{% endif %}
+    {% if previous %}<li><i class="ti ti-info-circle" aria-hidden="true"></i>Vigência depois da v{{ previous.version }} ({{ previous.effective_from|date:"d/m/Y" }}) e motivo</li>{% endif %}
+  </ul>
+  {% endif %}
+</aside>

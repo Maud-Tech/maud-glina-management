@@ -15,6 +15,12 @@ Modelo:
 
 ---
 
+## 2026-11-27 · products · telas de produtos, apólice, regulamento e documentos
+- **O que mudou:** telas do módulo `products`, no padrão do protótipo `docs/ui/products-preview.html`. Lista com busca e status; produto novo e edição (código e moeda travados fora do rascunho); detalhe com 5 abas (visão geral, regulamento, apólice, documentos, histórico); confirmação para ativar (diz o que falta), inativar, encerrar, expirar a apólice e arquivar documento; apólice nova e edição; regulamento em rascunho em 3 etapas, com o valor da versão anterior riscado, e a publicação como etapa 4 (vigência, motivo e o que muda). Grupo novo **Produtos** no menu. Nova consulta `open_product_document` (PDF só com login); `list_products` passa a trazer a apólice e `get_product` a lista de versões.
+- **Por quê:** protótipo aprovado pelo Victor em 27/11, com as respostas: grupo próprio no menu, permissões padrão do Django (publicar e expirar com `change`), regulamento em 4 etapas, limites de emissor e ativo pelos cadastros existentes, expirado só encerra.
+- **Pendente / atenção:** mexe na casca (`web/`): componentes novos no `app.css`, confirmação e linhas de limite no `app.js`, e `MenuItem.covers_prefix` no `navigation.py`. Fachada nova `assets.api.asset_class_choices()`. Avisar o time. Sem migration nova. Envio de PDF ainda sem arrastar-e-soltar com prévia; segue o padrão do branding.
+- **Autor:** Victor (+ IA)
+
 ## 2026-11-27 · products · cadastro de produtos, regulamentos e apólices (models + slices)
 - **O que mudou:** módulo novo `products`. Produto (vitrine, USD por padrão, status rascunho → ativo/inativo → expirado → encerrado), regulamento (apelido: mandato) com versões, nível de risco 1 a 5, retorno-alvo SOFR + spread, prazo médio máximo, classes elegíveis, regras de entrada e saída e limites de exposição; apólice (seguradora = `Entity` jurídica, moeda do produto, vigência, ativa/expirada); documentos em PDF (arquivados, nunca apagados); histórico append-only em `ProductChange` (produto, apólice, documentos) e `MandateChange` (regulamento e limites). 14 slices de comando e consulta, sem telas ainda.
 - **Por quê:** task "Cadastro de Produtos, Policies e Regulamentos". Desenho e respostas do Linhares no doc "Produtos, Apólices e Mandatos: esquema das tabelas" (27/11): versão nova do regulamento vale para todos, inclusive quem já comprou; produto expira com a apólice; sem taxas de entrada e saída.

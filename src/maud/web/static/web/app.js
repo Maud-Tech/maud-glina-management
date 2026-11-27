@@ -32,6 +32,53 @@
     total.value = index + 1;
   });
 
+  // Confirmação: botão com data-dialog="id" abre o <dialog id="id">; data-dialog-close fecha.
+  document.addEventListener("click", function (event) {
+    const opener = event.target.closest("[data-dialog]");
+    if (opener) {
+      const dialog = document.getElementById(opener.dataset.dialog);
+      if (dialog && typeof dialog.showModal === "function") { event.preventDefault(); dialog.showModal(); }
+      return;
+    }
+    const closer = event.target.closest("[data-dialog-close]");
+    if (closer) { event.preventDefault(); closer.closest("dialog").close(); }
+  });
+
+  // Linhas repetidas (ex.: limites): data-row-add copia o <template data-row-template>; data-row-remove apaga.
+  document.addEventListener("click", function (event) {
+    const add = event.target.closest("[data-row-add]");
+    if (add) {
+      const group = add.closest("[data-rows-group]");
+      const template = group.querySelector("template[data-row-template]");
+      group.querySelector("[data-rows]").appendChild(template.content.cloneNode(true));
+      group.querySelectorAll("[data-limit-dimension]").forEach(filterTargets);
+      return;
+    }
+    const remove = event.target.closest("[data-row-remove]");
+    if (remove) remove.closest("[data-row]").remove();
+  });
+
+  // Alvo do limite: só mostra as opções da dimensão escolhida (o servidor confere de novo).
+  function filterTargets(dimension) {
+    const select = dimension.closest("[data-row]").querySelector("[data-limit-target]");
+    if (!select) return;
+    let keep = false;
+    select.querySelectorAll("optgroup").forEach(function (group) {
+      const match = group.dataset.dimension === dimension.value;
+      group.hidden = !match;
+      group.disabled = !match;
+      if (match && Array.prototype.some.call(group.querySelectorAll("option"), function (o) { return o.selected; })) keep = true;
+    });
+    if (!keep) {
+      const first = select.querySelector('optgroup:not([hidden]) option');
+      select.value = first ? first.value : "";
+    }
+  }
+  document.querySelectorAll("[data-limit-dimension]").forEach(filterTargets);
+  document.addEventListener("change", function (event) {
+    if (event.target.matches("[data-limit-dimension]")) filterTargets(event.target);
+  });
+
   // Tema: cada pessoa escolhe; fica num cookie para o servidor já mandar a página certa.
   document.addEventListener("click", function (event) {
     const button = event.target.closest("[data-theme-toggle]");

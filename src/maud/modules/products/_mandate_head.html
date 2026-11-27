@@ -1,0 +1,7 @@
+<h1>Regulamento <mark>v{{ mandate.version }}.</mark></h1>
+{% if draft %}
+<p class="lead">Rascunho{% if previous %} copiado da v{{ previous.version }}. O que você mudar em relação à v{{ previous.version }} aparece marcado{% endif %}. Salvar o rascunho não muda nada para os clientes; só a publicação muda.</p>
+<nav class="tabs" aria-label="Etapas do regulamento">{% for key, label in steps %}{% if key == "publish" %}<a href="{% url 'products_mandate_publish' product.id mandate.id %}"{% else %}<a href="{% url 'products_mandate' product.id mandate.id %}?step={{ key }}"{% endif %}{% if key == step %} class="on" aria-current="step"{% elif key in done_steps %} class="done"{% endif %}><small>0{{ forloop.counter }}</small>{{ label }}</a>{% endfor %}</nav>
+{% else %}
+<p class="lead">Versão publicada: não muda mais. {% if mandate.effective_from %}Vale para todos os clientes a partir de {{ mandate.effective_from|date:"d/m/Y" }}.{% endif %}</p>
+{% endif %}

@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="dark">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Produtos · proposta Glina</title>
+<link rel="stylesheet" href="../../src/maud/web/static/web/vendor/tabler-icons.min.css">
+<link rel="stylesheet" href="../../src/maud/web/static/web/app.css">
+<style>
+/* Somente protótipo. O que for aprovado vira componente do app.css (nada de CSS solto na tela). */
+.prototype { padding: 10px 0 0; color: var(--faint); font-size: 11px; letter-spacing: .2em; text-transform: uppercase; }
+.head { display: flex; align-items: flex-end; gap: 18px; flex-wrap: wrap; }
+.head h1 { margin-bottom: 10px; }
+.head .actions { margin-left: auto; display: flex; gap: 10px; padding-bottom: 14px; flex-wrap: wrap; }
+.tag { display: inline-flex; align-items: center; gap: 7px; height: 26px; padding: 0 12px; border-radius: 99px; border: 1px solid var(--line-2); font-size: 12.5px; font-weight: 400; white-space: nowrap; }
+.tag::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--faint); }
+.tag.active::before { background: var(--ok); } .tag.draft::before { background: var(--warn); }
+.tag.expired::before { background: var(--err); } .tag.closed::before, .tag.inactive::before { background: var(--muted); }
+.tag.plain::before { display: none; }
+.tabs { display: flex; gap: 10px; margin: 30px 0 4px; flex-wrap: wrap; }
+.tabs a { display: inline-flex; align-items: center; gap: 10px; height: 42px; padding: 0 20px 0 6px; border-radius: 99px; border: 1px solid var(--line-2); color: var(--muted); font-size: 14.5px; text-decoration: none; }
+.tabs a small { font-size: 11px; color: var(--faint); width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; }
+.tabs a.on { background: var(--brand); border-color: var(--brand); color: var(--on-brand); font-weight: 500; }
+.tabs a.on small { background: color-mix(in srgb, #031011 14%, transparent); color: var(--on-brand); }
+.tabs a.done { color: var(--text); } .tabs a.done small { color: var(--brand); }
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 34px 0 6px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.stats.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.stat { padding: 22px 24px 22px 0; }
+.stat + .stat { border-left: 1px solid var(--line); padding-left: 24px; }
+.stat .kicker { display: block; margin-bottom: 8px; }
+.stat b { display: block; font-size: 30px; font-weight: 300; letter-spacing: -.02em; line-height: 1.1; }
+.stat span { font-size: 13px; color: var(--muted); }
+.stat span.up { color: var(--brand); }
+.kv { display: grid; grid-template-columns: 1fr auto; gap: 10px 12px; font-size: 14px; margin: 0; padding-bottom: 22px; border-bottom: 1px solid var(--line); }
+.kv dt { color: var(--muted); } .kv dd { margin: 0; text-align: right; font-weight: 400; }
+.kv.wide { grid-template-columns: 220px 1fr; border-bottom: 0; padding: 0; }
+.kv.wide dd { text-align: left; }
+.checks { list-style: none; padding: 18px 0 0; margin: 0; display: flex; flex-direction: column; gap: 10px; font-size: 13.5px; }
+.checks li { display: flex; gap: 10px; color: var(--muted); align-items: flex-start; } .checks i { font-size: 17px; line-height: 1.3; }
+.checks .ok i { color: var(--ok); } .checks .err i { color: var(--err); } .checks .err { color: var(--text); }
+.changed { color: var(--brand); font-size: 12.5px; margin-top: 6px; }
+.changed s { color: var(--faint); }
+.limits { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.limits th:nth-child(1) { width: 25%; } .limits th:nth-child(3), .limits th:nth-child(4) { width: 17%; } .limits th:nth-child(5) { width: 44px; }
+.limits .suffix .in { padding: 0 28px 0 12px; } .limits .suffix em { right: 12px; }
+.limits th { font-size: 12px; color: var(--muted); font-weight: 400; text-align: left; padding: 0 10px 10px 0; }
+.limits td { padding: 6px 10px 6px 0; vertical-align: top; }
+.limits td:last-child { width: 40px; padding-right: 0; }
+.limits .in { min-width: 0; }
+.add { display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 16px; border-radius: 99px; border: 1px dashed var(--line-2); color: var(--brand); font-size: 14px; margin-top: 12px; background: none; font-family: inherit; cursor: pointer; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 14px; border-radius: 99px; border: 1px solid var(--line-2); font-size: 14px; color: var(--muted); cursor: pointer; }
+.chip.on { border-color: var(--brand); color: var(--text); box-shadow: inset 0 0 0 1px var(--brand); font-weight: 400; }
+.chip.on i { color: var(--brand); }
+.risk { display: flex; gap: 8px; }
+.risk span { width: 46px; height: 46px; border-radius: 10px; border: 1px solid var(--line-2); display: grid; place-items: center; font-weight: 400; color: var(--muted); cursor: pointer; }
+.risk span.on { background: var(--brand); border-color: var(--brand); color: var(--on-brand); font-weight: 600; }
+.suffix { position: relative; } .suffix .in { padding-right: 64px; }
+.suffix em { position: absolute; right: 14px; top: 0; height: 46px; display: flex; align-items: center; font-style: normal; color: var(--faint); font-size: 13px; }
+.prefix { display: flex; align-items: center; gap: 10px; }
+.prefix > span { color: var(--faint); font-size: 13px; white-space: nowrap; }
+.versions { list-style: none; margin: 0; padding: 0; }
+.versions li { display: grid; grid-template-columns: 54px 1fr auto; gap: 14px; align-items: baseline; padding: 16px 0; border-top: 1px solid var(--line); }
+.versions li:last-child { border-bottom: 1px solid var(--line); }
+.versions b { font-weight: 500; font-size: 17px; } .versions span { color: var(--muted); font-size: 13.5px; }
+.timeline { list-style: none; margin: 26px 0 0; padding: 0; }
+.timeline li { display: grid; grid-template-columns: 130px 1fr; gap: 26px; padding: 20px 0; border-top: 1px solid var(--line); }
+.timeline time { color: var(--muted); font-size: 13px; line-height: 1.5; }
+.timeline time b { display: block; color: var(--text); font-weight: 400; font-size: 14px; }
+.timeline .what { font-weight: 400; }
+.timeline .what small { color: var(--faint); font-size: 11px; letter-spacing: .2em; text-transform: uppercase; margin-right: 10px; }
+.diff { margin: 8px 0 0; padding: 0; list-style: none; font-size: 13.5px; color: var(--muted); }
+.diff li { display: block; padding: 2px 0; border: 0; }
+.diff s { color: var(--faint); } .diff b { color: var(--text); font-weight: 400; }
+.reason { margin-top: 8px; border-left: 2px solid var(--line-2); padding-left: 12px; font-size: 13.5px; color: var(--text); }
+.file { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--line); font-size: 14.5px; font-weight: 400; }
+.file i.ti-file-type-pdf { font-size: 22px; color: var(--muted); }
+.file .meta { color: var(--faint); font-weight: 300; font-size: 13px; display: block; }
+.file .grow { flex: 1; } .file.archived { opacity: .55; }
+.danger { border-left: 2px solid var(--err); padding: 4px 0 4px 16px; margin-top: 10px; }
+.danger b { display: block; font-weight: 500; margin-bottom: 4px; }
+.danger p { margin: 0 0 14px; color: var(--muted); font-size: 14px; }
+.btn.danger-btn { border-color: var(--err); color: var(--err); }
+.btn.small { height: 38px; padding: 0 16px; font-size: 14px; }
+.registration-table td small { display: block; color: var(--muted); font-weight: 300; font-size: 13px; }
+.registration-table a.link { white-space: nowrap; }
+.empty { color: var(--faint); }
+dialog { background: var(--bg); color: var(--text); border: 1px solid var(--line-2); border-radius: 14px; padding: 28px 30px; max-width: 520px; width: calc(100% - 40px); }
+dialog::backdrop { background: rgba(0, 0, 0, .55); }
+dialog h2 { margin: 0 0 8px; font-size: 22px; font-weight: 500; letter-spacing: -.01em; }
+dialog p { color: var(--muted); margin: 0 0 18px; }
+dialog .actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; }
+@media (max-width: 1200px) { .body { grid-template-columns: minmax(0, 1fr); } .aside { position: static; padding-top: 0; } .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } .stat:nth-child(3) { border-left: 0; padding-left: 0; border-top: 1px solid var(--line); } .stat:nth-child(4) { border-top: 1px solid var(--line); } .stats.three { grid-template-columns: repeat(3, minmax(0, 1fr)); } .stats.three .stat:nth-child(3) { border-left: 1px solid var(--line); padding-left: 24px; border-top: 0; } }
+@media (max-width: 760px) { .sec, .grid { grid-template-columns: minmax(0, 1fr); gap: 18px; } .bar { margin-left: -20px; margin-right: -20px; padding: 16px 20px; flex-wrap: wrap; } .timeline li { grid-template-columns: 1fr; gap: 6px; } .kv.wide { grid-template-columns: 1fr; } .head .actions { margin-left: 0; } .stats, .stats.three { grid-template-columns: 1fr; } .stat + .stat, .stats.three .stat:nth-child(3) { border-left: 0; padding-left: 0; border-top: 1px solid var(--line); } .limits thead { display: none; } .limits tr { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 10px 0; border-top: 1px solid var(--line); } .limits td { padding: 0; } .limits td:first-child, .limits td:nth-child(2) { grid-column: 1 / -1; } .who { display: none; } }
+</style></head>
+<body>
+<div class="app">
+<aside class="side">
+  <a class="wordmark" href="?view=list"><span class="mark">GD</span><b>Gestão de apólices</b></a>
+  <details class="nav-group"><summary class="kicker">Carteira<span class="nav-chevron"></span></summary><nav class="nav"><a href="#">Painel</a></nav></details>
+  <details class="nav-group" open><summary class="kicker">Produtos<span class="nav-chevron"></span></summary><nav class="nav"><a class="on" href="?view=list">Cadastro de produtos</a></nav></details>
+  <details class="nav-group"><summary class="kicker">Pessoas e entidades<span class="nav-chevron"></span></summary><nav class="nav"><a href="#">Pessoas físicas e jurídicas</a></nav></details>
+  <details class="nav-group"><summary class="kicker">Ativos<span class="nav-chevron"></span></summary><nav class="nav"><a href="#">Cadastro de ativos</a></nav></details>
+  <details class="nav-group"><summary class="kicker">Negociação<span class="nav-chevron"></span></summary><nav class="nav"><a href="#">Casas de negociação</a></nav></details>
+  <details class="nav-group"><summary class="kicker">Administração<span class="nav-chevron"></span></summary><nav class="nav"><a href="#">Personalização</a></nav></details>
+</aside>
+<main class="main">
+  <div class="top">
+    <div class="crumb" id="crumb"></div><div class="grow"></div>
+    <button class="icon-btn" type="button" id="theme" title="Trocar o tema" aria-label="Trocar o tema"><i class="ti ti-contrast-2"></i></button>
+    <div class="who"><i class="av">AD</i>admin</div>
+  </div>
+  <div class="prototype">Proposta visual · dados ilustrativos · nada é gravado</div>
+  <div id="content"></div>
+</main>
+</div>
+<dialog id="confirm"></dialog>
+<script>
+const params = new URLSearchParams(location.search);
+const view = params.get('view') || 'list';
+const tab = params.get('tab') || 'overview';
+document.documentElement.dataset.theme = params.get('theme') || 'dark';
+document.getElementById('theme').onclick = () => {
+  const root = document.documentElement; root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
+};
+
+const STATUS = { DRAFT: ['draft', 'Rascunho'], ACTIVE: ['active', 'Ativo'], INACTIVE: ['inactive', 'Inativo'], EXPIRED: ['expired', 'Expirado'], CLOSED: ['closed', 'Encerrado'] };
+const tag = s => `<span class="tag ${STATUS[s][0]}">${STATUS[s][1]}</span>`;
+const PRODUCTS = [
+  { code: 'GLINA-USD-01', name: 'Glina Conservador USD', currency: 'USD', status: 'ACTIVE', mandate: 'v1 · risco 2', next: 'v2 a partir de 27/12/2026', policy: 'AP-2026-001', policyNote: 'vigente até 26/11/2031' },
+  { code: 'GLINA-USD-02', name: 'Glina Moderado USD', currency: 'USD', status: 'DRAFT', mandate: 'v1 em rascunho', next: 'faltam 9 campos para publicar', policy: '—', policyNote: 'sem apólice' },
+  { code: 'GLINA-EUR-01', name: 'Glina Euro 2026', currency: 'EUR', status: 'EXPIRED', mandate: 'v1 · risco 1', next: '', policy: 'NB-7781', policyNote: 'expirada em 27/11/2026' },
+];
+
+const field = (label, value = '', opts = {}) => {
+  const req = opts.req ? ' <em>*</em>' : '';
+  const cls = 'f' + (opts.full ? ' full' : '') + (opts.bad ? ' bad' : '');
+  let input;
+  if (opts.options) input = `<select class="in"${opts.disabled ? ' disabled' : ''}>${opts.options.map(o => `<option${o === value ? ' selected' : ''}>${o}</option>`).join('')}</select>`;
+  else if (opts.area) input = `<textarea class="in" rows="3" style="height:auto;padding-top:12px" placeholder="${opts.ph || ''}">${value}</textarea>`;
+  else if (opts.suffix) input = `<div class="suffix"><input class="in" value="${value}" placeholder="${opts.ph || ''}"><em>${opts.suffix}</em></div>`;
+  else if (opts.prefix) input = `<div class="prefix"><span>${opts.prefix}</span><input class="in" value="${value}" placeholder="${opts.ph || ''}"></div>`;
+  else input = `<input class="in" type="${opts.type || 'text'}" value="${value}" placeholder="${opts.ph || ''}"${opts.disabled ? ' disabled' : ''}>`;
+  const msg = opts.msg ? `<div class="msg${opts.bad ? ' err' : ''}">${opts.msg}</div>` : '';
+  const changed = opts.was !== undefined ? `<div class="changed">Na v1: <s>${opts.was}</s></div>` : '';
+  return `<div class="${cls}"><label>${label}${req}</label>${input}${msg}${changed}</div>`;
+};
+const section = (title, hint, inner, grid = true) => `<section class="sec"><div><h2>${title}</h2><p class="hint">${hint}</p></div>${grid ? `<div class="grid">${inner}</div>` : `<div>${inner}</div>`}</section>`;
+const bar = (note, buttons) => `<div class="bar"><span class="note">${note}</span><div class="grow"></div>${buttons}</div>`;
+
+let crumb = '', html = '';
+
+if (view === 'list') {
+  crumb = 'Produtos / <span>Cadastro de produtos</span>';
+  html = `<h1>Seus <mark>produtos.</mark></h1>
+  <p class="lead">Cada produto tem um regulamento com versões e uma apólice. Abra o produto para ver, editar e acompanhar o histórico.</p>
+  <div class="registration-toolbar">
+    <div class="f"><label>Buscar por código ou nome</label><input class="in" placeholder="Digite para buscar"></div>
+    <div class="f"><label>Status</label><select class="in"><option>Todos</option><option>Rascunho</option><option>Ativo</option><option>Inativo</option><option>Expirado</option><option>Encerrado</option></select></div>
+    <button class="btn">Filtrar</button>
+    <a class="btn primary" href="?view=new">Novo produto</a>
+  </div>
+  <div class="registration-table-wrap"><table class="registration-table"><thead><tr><th>Produto</th><th>Moeda</th><th>Status</th><th>Regulamento</th><th>Apólice</th><th>Ação</th></tr></thead><tbody>
+  ${PRODUCTS.map(p => `<tr><td>${p.name}<small>${p.code}</small></td><td>${p.currency}</td><td>${tag(p.status)}</td><td>${p.mandate}<small>${p.next || '&nbsp;'}</small></td><td>${p.policy}<small>${p.policyNote}</small></td><td><a class="link" href="?view=detail${p.status === 'DRAFT' ? '&product=draft' : p.status === 'EXPIRED' ? '&product=expired' : ''}">Abrir produto →</a></td></tr>`).join('')}
+  </tbody></table></div>
+  <p class="msg">3 registros · Página 1 de 1</p>`;
+}
+
+else if (view === 'new') {
+  crumb = '<a href="?view=list">Produtos</a> / <span>Novo produto</span>';
+  html = `<form class="registration-form"><h1>Novo <mark>produto.</mark></h1>
+  <p class="lead">O produto nasce em rascunho. Depois de salvo, você cadastra a apólice e o regulamento e então ativa.</p>
+  <div class="body"><div>
+  ${section('Identificação', 'Código e moeda não mudam depois que o produto sai do rascunho.',
+    field('Código', 'GLINA-USD-03', { req: true, msg: 'Letras, números e hífen. Único no app.' }) +
+    field('Nome', 'Glina Arrojado USD', { req: true }) +
+    field('Moeda base', 'USD · US Dollar', { req: true, options: ['USD · US Dollar', 'EUR · Euro'], msg: 'Padrão USD. A apólice segue esta moeda.' }) +
+    field('Descrição', 'Carteira com mais renda variável, horizonte de 5 anos.', { full: true, area: true }))}
+  ${section('Datas', 'Opcionais. O encerramento não pode ser antes do lançamento.',
+    field('Lançamento', '2027-01-04', { type: 'date' }) +
+    field('Encerramento', '2026-12-01', { type: 'date', bad: true, msg: 'O encerramento tem de ser depois do lançamento.' }))}
+  </div>
+  <aside class="aside"><div class="quote"><b>Glina Arrojado USD</b><span>GLINA-USD-03 · USD · Rascunho</span></div>
+  <div class="kicker">Para ativar depois</div>
+  <ul class="checks">
+    <li><i class="ti ti-circle-dashed"></i>Apólice cadastrada e vigente</li>
+    <li><i class="ti ti-circle-dashed"></i>Regulamento publicado e em vigor</li>
+  </ul></aside></div>
+  ${bar('Produto novo, em rascunho', '<a class="btn" href="?view=list">Voltar à lista</a><a class="btn" href="?view=list">Cancelar</a><a class="btn primary" href="?view=detail&product=draft">Salvar produto</a>')}
+  </form>`;
+}
+
+else if (view === 'detail') {
+  const kind = params.get('product') || 'active';
+  const p = kind === 'draft' ? PRODUCTS[1] : kind === 'expired' ? PRODUCTS[2] : PRODUCTS[0];
+  const base = `?view=detail${kind === 'active' ? '' : '&product=' + kind}`;
+  const tabs = [['overview', 'Visão geral'], ['mandate', 'Regulamento'], ['policy', 'Apólice'], ['documents', 'Documentos'], ['history', 'Histórico']];
+  crumb = `<a href="?view=list">Produtos</a> / <span>${p.code}</span>`;
+  const actions = {
+    active: '<a class="btn small" href="?view=edit">Editar</a><button class="btn small" data-confirm="inactive">Inativar</button><button class="btn small" data-confirm="close">Encerrar</button>',
+    draft: '<a class="btn small" href="?view=edit">Editar</a><button class="btn small" data-confirm="close">Encerrar</button><button class="btn small primary" data-confirm="activate-blocked">Ativar</button>',
+    expired: '<button class="btn small" data-confirm="close">Encerrar</button>',
+  }[kind];
+  html = `<div class="head"><h1>${p.name.replace(/(\w+)$/, '<mark>$1.</mark>')}</h1><div class="actions">${actions}</div></div>
+  <p class="lead">${tag(p.status)} &nbsp; ${p.code} · moeda base ${p.currency}${kind === 'expired' ? ' · expirou junto com a apólice NB-7781; agora só pode ser encerrado' : ''}</p>
+  <nav class="tabs">${tabs.map(([k, l], i) => `<a class="${k === tab ? 'on' : ''}" href="${base}&tab=${k}"><small>${String(i + 1).padStart(2, '0')}</small>${l}</a>`).join('')}</nav>`;
+
+  if (tab === 'overview') {
+    if (kind === 'draft') {
+      html += `<div class="stats">
+        <div class="stat"><span class="kicker">Status</span><b>Rascunho</b><span>criado em 27/11/2026</span></div>
+        <div class="stat"><span class="kicker">Regulamento</span><b>v1</b><span>em rascunho</span></div>
+        <div class="stat"><span class="kicker">Apólice</span><b>—</b><span>não cadastrada</span></div>
+        <div class="stat"><span class="kicker">Documentos</span><b>0</b><span>nenhum anexo</span></div></div>
+      <div class="body"><div>
+      ${section('Antes de ativar', 'O produto só fica ativo com as duas condições abaixo.', `<ul class="checks" style="padding-top:0">
+        <li class="err"><i class="ti ti-alert-circle"></i><span>Nenhuma apólice cadastrada. <a class="link" href="?view=policy">Cadastrar apólice →</a></span></li>
+        <li class="err"><i class="ti ti-alert-circle"></i><span>Regulamento v1 ainda em rascunho, faltam 9 campos. <a class="link" href="?view=mandate">Continuar regulamento →</a></span></li></ul>`, false)}
+      ${section('Identificação', 'Enquanto rascunho, código e moeda ainda podem mudar.', `<dl class="kv wide"><dt>Código</dt><dd>GLINA-USD-02</dd><dt>Nome</dt><dd>Glina Moderado USD</dd><dt>Moeda base</dt><dd>USD</dd><dt>Descrição</dt><dd>Em montagem.</dd></dl>`, false)}
+      </div><aside class="aside"><div class="quote"><b>Rascunho</b><span>Ninguém compra este produto enquanto ele não for ativado.</span></div></aside></div>`;
+    } else {
+      const expired = kind === 'expired';
+      html += `<div class="stats three">
+        <div class="stat"><span class="kicker">Status</span><b>${expired ? 'Expirado' : 'Ativo'}</b><span>desde 27/11/2026</span></div>
+        <div class="stat"><span class="kicker">Regulamento vigente</span><b>v1</b><span>em vigor desde 27/11/2026</span></div>
+        <div class="stat"><span class="kicker">Apólice</span><b>${expired ? 'NB-7781' : 'AP-2026-001'}</b><span>${expired ? 'expirada em 27/11/2026' : 'vigente até 26/11/2031'}</span></div></div>
+      <div class="body"><div>
+      ${section('Perfil', 'Do regulamento vigente. A v2 muda o que está marcado.', `<dl class="kv wide">
+        <dt>Nível de risco</dt><dd>2 de 5</dd>
+        <dt>Retorno-alvo</dt><dd>SOFR + 2,00% a.a.${expired ? '' : ' <span class="changed">→ SOFR + 2,50% na v2</span>'}</dd>
+        <dt>Liquidez</dt><dd>30 dias</dd>
+        <dt>Prazo médio máximo</dt><dd>3,5 anos</dd>
+        <dt>Classes elegíveis</dt><dd>Renda variável, Renda fixa</dd>
+        <dt>Renda variável</dt><dd>0% a 20%${expired ? '' : ' <span class="changed">→ até 30% na v2</span>'}</dd>
+        <dt>Renda fixa</dt><dd>60% a 100%</dd>
+        <dt>Em USD</dt><dd>80% a 100%</dd></dl>`, false)}
+      ${section('Entrada e saída', 'Sem taxas de entrada ou saída.', `<dl class="kv wide">
+        <dt>Aplicação inicial mínima</dt><dd>USD 10.000,00</dd><dt>Aplicação adicional mínima</dt><dd>USD 1.000,00</dd>
+        <dt>Liquidação da aplicação</dt><dd>D+2</dd><dt>Resgate mínimo</dt><dd>USD 1.000,00</dd>
+        <dt>Saldo mínimo</dt><dd>USD 5.000,00</dd><dt>Aviso de resgate</dt><dd>5 dias</dd>
+        <dt>Liquidação do resgate</dt><dd>D+5</dd><dt>Carência</dt><dd>12 meses</dd></dl>`, false)}
+      </div><aside class="aside"><div class="quote"><b>${p.name}</b><span>${p.code} · ${p.currency}</span></div>
+      <dl class="kv"><dt>Seguradora</dt><dd>${expired ? 'Northbridge' : 'Atlântica Life'}</dd><dt>Documentos</dt><dd>${expired ? '0' : '2'}</dd><dt>Última alteração</dt><dd>27/11/2026</dd></dl>
+      <ul class="checks">${expired ? '<li class="err"><i class="ti ti-alert-circle"></i>Apólice expirada: produto não pode voltar a ativo</li>' : '<li class="ok"><i class="ti ti-circle-check"></i>Apólice vigente</li><li class="ok"><i class="ti ti-circle-check"></i>Regulamento publicado</li>'}</ul></aside></div>`;
+    }
+  }
+
+  else if (tab === 'mandate') {
+    const draft = kind === 'draft';
+    html += `<div class="body"><div>
+    ${section('Versões', 'Versão publicada não muda. Para alterar, abra um rascunho: ele copia a última versão.', `<ul class="versions">
+      ${draft ? '<li><b>v1</b><div>Rascunho<br><span>9 campos faltando para publicar</span></div><a class="link" href="?view=mandate">Continuar →</a></li>' :
+      `<li><b>v2</b><div>Publicada, vale a partir de 27/12/2026<br><span>“Comitê aprovou subir renda variável para 30%.” · admin, 27/11/2026</span></div><a class="link" href="?view=mandate&mode=view">Ver →</a></li>
+       <li><b>v1</b><div>Em vigor desde 27/11/2026<br><span>Primeira versão · admin, 27/11/2026</span></div><a class="link" href="?view=mandate&mode=view">Ver →</a></li>`}
+    </ul>${draft || kind === 'expired' ? '' : '<a class="add" href="?view=mandate"><i class="ti ti-plus"></i>Nova versão (rascunho a partir da v2)</a>'}`, false)}
+    </div><aside class="aside"><div class="quote"><b>Vale para todos</b><span>Quando uma versão entra em vigor, ela vale para todo cliente, inclusive quem já comprou. As anteriores ficam guardadas.</span></div></aside></div>`;
+  }
+
+  else if (tab === 'policy') {
+    if (kind === 'draft') {
+      html += `<div class="body"><div>${section('Apólice', 'Uma por produto. A seguradora tem de ser pessoa jurídica.', `<p class="empty" style="margin-top:0">Nenhuma apólice cadastrada.</p><a class="btn primary" href="?view=policy">Cadastrar apólice</a>`, false)}</div></div>`;
+    } else {
+      const expired = kind === 'expired';
+      html += `<div class="body"><div>
+      ${section('Apólice', 'Moeda sempre igual à do produto.', `<dl class="kv wide">
+        <dt>Número</dt><dd>${expired ? 'NB-7781' : 'AP-2026-001'}</dd><dt>Seguradora</dt><dd>${expired ? 'Northbridge Insurance Company' : 'Atlântica Life Assurance Ltd'}</dd>
+        <dt>Moeda</dt><dd>${p.currency}</dd><dt>Emissão</dt><dd>${expired ? '—' : '28/10/2026'}</dd>
+        <dt>Vigência</dt><dd>${expired ? 'de 28/09/2026, sem data final' : '28/10/2026 a 26/11/2031'}</dd><dt>Situação</dt><dd>${expired ? tag('EXPIRED') : '<span class="tag active">Ativa</span>'}</dd></dl>
+        ${expired ? '' : '<p style="margin-top:20px"><a class="btn small" href="?view=policy&mode=edit">Editar apólice</a></p>'}`, false)}
+      ${expired ? '' : section('Expirar', 'Use quando a seguradora encerrar ou não renovar o contrato.', `<div class="danger"><b>Expirar a apólice expira o produto.</b><p>O produto deixa de estar ativo e, depois disso, só pode ser encerrado. Não dá para desfazer.</p><button class="btn small danger-btn" data-confirm="expire">Expirar apólice</button></div>`, false)}
+      </div></div>`;
+    }
+  }
+
+  else if (tab === 'documents') {
+    const none = kind !== 'active';
+    html += `<div class="body"><div>
+    ${section('Enviar', 'Só PDF, até 20 MB. O arquivo fica guardado com o produto.', `<div class="grid">
+      ${field('Tipo', 'Regulamento', { req: true, options: ['Regulamento', 'Lâmina', 'Contrato da apólice', 'Outro'] })}
+      ${field('Título', '', { req: true, ph: 'Ex.: Regulamento v2' })}
+      <div class="f full"><label class="drop"><i class="ti ti-upload"></i><span>Arraste o PDF aqui ou <span class="link">escolha no computador</span><br><small>PDF até 20 MB</small></span><input type="file" accept="application/pdf"></label></div></div>`, false)}
+    ${section('Enviados', 'Documento não é apagado: é arquivado e continua no histórico.', none ? '<p class="empty" style="margin-top:0">Nenhum documento enviado.</p>' : `
+      <div class="file"><i class="ti ti-file-type-pdf"></i><span class="grow">Regulamento v1<span class="meta">Regulamento · 72 bytes · admin, 27/11/2026</span></span><a class="link" href="#">Abrir</a><button class="btn small" data-confirm="archive">Arquivar</button></div>
+      <div class="file"><i class="ti ti-file-type-pdf"></i><span class="grow">Contrato da apólice AP-2026-001<span class="meta">Contrato da apólice · ligado à AP-2026-001 · admin, 27/11/2026</span></span><a class="link" href="#">Abrir</a><button class="btn small" data-confirm="archive">Arquivar</button></div>
+      <div class="file archived"><i class="ti ti-file-type-pdf"></i><span class="grow">Lâmina antiga<span class="meta">Lâmina · arquivada em 20/11/2026 · “lâmina nova”</span></span><a class="link" href="#">Abrir</a></div>`, false)}
+    </div></div>`;
+  }
+
+  else if (tab === 'history') {
+    const items = [
+      ['27/11/2026', '19:48', 'Regulamento v2', 'Publicado', [['estado', 'Rascunho', 'Publicado'], ['vigência', '—', '27/12/2026']], 'Comitê aprovou subir renda variável para 30%.'],
+      ['27/11/2026', '19:48', 'Regulamento v2 · limite', 'Alterado', [['Renda variável, máximo', '20%', '30%']], ''],
+      ['27/11/2026', '19:48', 'Regulamento v2', 'Alterado', [['retorno-alvo, spread', '2,00%', '2,50%']], ''],
+      ['27/11/2026', '19:48', 'Produto', 'Status alterado', [['status', 'Rascunho', 'Ativo']], ''],
+      ['27/11/2026', '19:48', 'Documento', 'Criado', [['título', '—', 'Regulamento v1']], ''],
+      ['27/11/2026', '19:48', 'Apólice', 'Criada', [['número', '—', 'AP-2026-001'], ['seguradora', '—', 'Atlântica Life Assurance Ltd']], ''],
+      ['27/11/2026', '19:48', 'Produto', 'Criado', [['código', '—', 'GLINA-USD-01'], ['moeda base', '—', 'USD']], ''],
+    ];
+    html += `<div class="registration-toolbar">
+      <div class="f"><label>O que mudou</label><select class="in"><option>Tudo</option><option>Produto</option><option>Apólice</option><option>Regulamento e limites</option><option>Documentos</option></select></div>
+      <button class="btn">Filtrar</button></div>
+    <ul class="timeline">${items.map(([d, t, what, action, changes, reason]) => `<li><time><b>${d}</b>${t} · admin</time><div>
+      <div class="what"><small>${what}</small>${action}</div>
+      <ul class="diff">${changes.map(([f, a, b]) => `<li>${f}: <s>${a}</s> → <b>${b}</b></li>`).join('')}</ul>
+      ${reason ? `<div class="reason">${reason}</div>` : ''}</div></li>`).join('')}</ul>
+    <p class="msg">7 registros · o histórico nunca é apagado nem alterado</p>`;
+  }
+}
+
+else if (view === 'edit') {
+  crumb = '<a href="?view=list">Produtos</a> / <a href="?view=detail">GLINA-USD-01</a> / <span>Editar</span>';
+  html = `<form class="registration-form"><h1>Editar <mark>produto.</mark></h1>
+  <p class="lead">Produto ativo: código e moeda base estão travados. Toda alteração vai para o histórico com o motivo.</p>
+  <div class="body"><div>
+  ${section('Identificação', 'Código e moeda só mudam em rascunho.',
+    field('Código', 'GLINA-USD-01', { disabled: true, msg: 'Travado depois que o produto sai do rascunho.' }) +
+    field('Nome', 'Glina Conservador USD', { req: true }) +
+    field('Moeda base', 'USD · US Dollar', { options: ['USD · US Dollar'], disabled: true }) +
+    field('Descrição', 'Carteira conservadora em dólar, foco em renda fixa.', { full: true, area: true }))}
+  ${section('Datas', 'Opcionais.', field('Lançamento', '2026-11-27', { type: 'date' }) + field('Encerramento', '', { type: 'date' }))}
+  ${section('Motivo', 'Fica no histórico, junto com quem alterou.', field('Por que está alterando?', '', { full: true, area: true, ph: 'Opcional' }))}
+  </div><aside class="aside"><div class="quote"><b>Glina Conservador USD</b><span>GLINA-USD-01 · USD · Ativo</span></div></aside></div>
+  ${bar('Alteração de produto ativo', '<a class="btn" href="?view=detail">Cancelar</a><a class="btn primary" href="?view=detail&tab=history">Salvar alterações</a>')}
+  </form>`;
+}
+
+else if (view === 'policy') {
+  const editing = params.get('mode') === 'edit';
+  crumb = `<a href="?view=list">Produtos</a> / <a href="?view=detail${editing ? '' : '&product=draft'}">${editing ? 'GLINA-USD-01' : 'GLINA-USD-02'}</a> / <span>${editing ? 'Editar apólice' : 'Nova apólice'}</span>`;
+  html = `<form class="registration-form"><h1>${editing ? 'Editar' : 'Cadastrar'} <mark>apólice.</mark></h1>
+  <p class="lead">Uma apólice por produto, na moeda do produto. O número não se repete na mesma seguradora.</p>
+  <div class="body"><div>
+  ${section('Apólice', 'A seguradora vem do cadastro de pessoas jurídicas.',
+    field('Número', editing ? 'AP-2026-001' : 'AP-2026-014', { req: true }) +
+    field('Seguradora', editing ? 'Atlântica Life Assurance Ltd' : 'Northbridge Insurance Company', { req: true, options: ['Atlântica Life Assurance Ltd', 'Northbridge Insurance Company'], msg: 'Só pessoas jurídicas aparecem aqui.' }) +
+    field('Moeda', editing ? 'USD · US Dollar' : 'USD · US Dollar', { options: ['USD · US Dollar'], disabled: true, msg: 'Igual à moeda base do produto.' }) +
+    field('Emissão', editing ? '2026-10-28' : '2026-11-20', { type: 'date' }))}
+  ${section('Vigência', 'O último dia conta como vigente. Sem data final, vale até ser expirada.',
+    field('Início', editing ? '2026-10-28' : '2026-12-01', { req: true, type: 'date' }) +
+    field('Fim', editing ? '2031-11-26' : '', { type: 'date', msg: 'Opcional.' }))}
+  ${editing ? section('Motivo', 'Fica no histórico.', field('Por que está alterando?', '', { full: true, area: true, ph: 'Opcional' })) : ''}
+  </div><aside class="aside"><div class="quote"><b>${editing ? 'AP-2026-001' : 'AP-2026-014'}</b><span>${editing ? 'Atlântica Life · USD' : 'Northbridge · USD'}</span></div>
+  <ul class="checks"><li class="ok"><i class="ti ti-circle-check"></i>Seguradora é pessoa jurídica</li><li class="ok"><i class="ti ti-circle-check"></i>Número livre nesta seguradora</li>${editing ? '' : '<li class="err"><i class="ti ti-alert-circle"></i>Começa em 01/12: até lá o produto não pode ser ativado</li>'}</ul></aside></div>
+  ${bar(editing ? 'Alteração de apólice' : 'Apólice nova', `<a class="btn" href="?view=detail${editing ? '' : '&product=draft'}&tab=policy">Cancelar</a><a class="btn primary" href="?view=detail${editing ? '' : '&product=draft'}&tab=policy">Salvar apólice</a>`)}
+  </form>`;
+}
+
+else if (view === 'mandate') {
+  const step = params.get('step') || 'profile';
+  const steps = [['profile', 'Perfil e retorno'], ['flows', 'Entrada e saída'], ['limits', 'Limites de exposição'], ['publish', 'Publicação']];
+  const idx = steps.findIndex(s => s[0] === step);
+  crumb = '<a href="?view=list">Produtos</a> / <a href="?view=detail&tab=mandate">GLINA-USD-01</a> / <span>Regulamento v3 (rascunho)</span>';
+  html = `<form class="registration-form"><h1>Regulamento <mark>v3.</mark></h1>
+  <p class="lead">Rascunho copiado da v2. O que você mudar em relação à v2 aparece marcado. Salvar o rascunho não muda nada para os clientes; só a publicação muda.</p>
+  <nav class="tabs">${steps.map(([k, l], i) => `<a class="${k === step ? 'on' : i < idx ? 'done' : ''}" href="?view=mandate&step=${k}"><small>${String(i + 1).padStart(2, '0')}</small>${l}</a>`).join('')}</nav>
+  <div class="body"><div>`;
+  if (step === 'profile') {
+    html += section('Risco', 'De 1 (mais conservador) a 5 (mais arrojado).', `<div class="risk">${[1, 2, 3, 4, 5].map(n => `<span class="${n === 3 ? 'on' : ''}">${n}</span>`).join('')}</div><div class="changed">Na v2: <s>2</s></div>`, false)
+      + section('Retorno-alvo', 'Referência SOFR mais um spread ao ano.',
+        field('Referência', 'SOFR', { options: ['SOFR'], req: true }) +
+        field('Spread', '2,50', { req: true, suffix: '% a.a.' }))
+      + section('Prazo e liquidez', 'Prazo médio da carteira com teto por produto.',
+        field('Liquidez', '30', { req: true, suffix: 'dias' }) +
+        field('Prazo médio máximo', '3,5', { req: true, suffix: 'anos' }))
+      + section('Classes elegíveis', 'Só estas classes podem entrar na carteira. Limite de classe precisa estar aqui.',
+        `<div class="chips">${[['Renda variável', 1], ['Renda fixa', 1], ['Fundos', 0], ['Caixa', 0], ['Imóveis', 0], ['Commodities', 0], ['Outros', 0]].map(([l, on]) => `<span class="chip${on ? ' on' : ''}"><i class="ti ti-${on ? 'check' : 'plus'}"></i>${l}</span>`).join('')}</div>`, false)
+      + section('Observações', 'Texto livre, aparece no regulamento.', field('Observações', 'Regulamento de exemplo para validação local.', { full: true, area: true }));
+  } else if (step === 'flows') {
+    html += section('Aplicação', 'Valores na moeda do produto. Sem taxa de entrada.',
+      field('Aplicação inicial mínima', '10.000,00', { req: true, prefix: 'USD' }) +
+      field('Aplicação adicional mínima', '1.000,00', { prefix: 'USD' }) +
+      field('Liquidação da aplicação', '2', { req: true, suffix: 'dias' }))
+      + section('Resgate', 'Sem taxa de saída.',
+      field('Resgate mínimo', '1.000,00', { prefix: 'USD' }) +
+      field('Saldo mínimo', '5.000,00', { prefix: 'USD' }) +
+      field('Aviso de resgate', '5', { suffix: 'dias' }) +
+      field('Liquidação do resgate', '5', { req: true, suffix: 'dias' }) +
+      field('Carência', '12', { suffix: 'meses' }));
+  } else if (step === 'limits') {
+    const row = (dim, target, min, max, bad) => `<tr><td><select class="in"><option${dim === 'Classe de ativo' ? ' selected' : ''}>Classe de ativo</option><option${dim === 'Moeda' ? ' selected' : ''}>Moeda</option><option${dim === 'País' ? ' selected' : ''}>País</option><option${dim === 'Emissor' ? ' selected' : ''}>Emissor</option><option${dim === 'Ativo' ? ' selected' : ''}>Ativo</option></select></td>
+      <td><select class="in">${[target].map(t => `<option>${t}</option>`).join('')}</select>${bad ? `<div class="msg err">${bad}</div>` : ''}</td>
+      <td><div class="suffix"><input class="in" value="${min}"><em>%</em></div></td><td><div class="suffix"><input class="in" value="${max}"><em>%</em></div></td>
+      <td><button type="button" class="icon-btn" aria-label="Remover limite"><i class="ti ti-x"></i></button></td></tr>`;
+    html += section('Limites', 'Mínimo e máximo em % da carteira. Um limite por dimensão e alvo.', `<table class="limits"><thead><tr><th>Dimensão</th><th>Alvo</th><th>Mínimo</th><th>Máximo</th><th></th></tr></thead><tbody>
+      ${row('Classe de ativo', 'Renda variável', '0', '30')}
+      ${row('Classe de ativo', 'Renda fixa', '60', '100')}
+      ${row('Moeda', 'USD · US Dollar', '80', '100')}
+      ${row('Classe de ativo', 'Fundos', '0', '10', 'Fundos não está nas classes elegíveis. Marque a classe na etapa 01 ou remova o limite.')}
+      </tbody></table><button type="button" class="add"><i class="ti ti-plus"></i>Adicionar limite</button><div class="changed" style="margin-top:14px">Em relação à v2: 1 limite novo (Fundos).</div>`, false);
+  } else {
+    html += section('Vigência', 'A partir desta data a versão vale para todos os clientes, inclusive quem já comprou. Tem de ser depois da v2 (27/12/2026).',
+      field('Em vigor a partir de', '2027-01-27', { req: true, type: 'date' }))
+      + section('Motivo', 'Obrigatório a partir da v2. Fica no histórico e aparece no detalhe da versão.',
+      field('Por que esta versão?', 'Comitê de 26/01: risco sobe para 3.', { full: true, area: true, req: true }))
+      + section('O que muda', 'Comparado com a v2.', `<ul class="diff" style="margin:0"><li>nível de risco: <s>2</s> → <b>3</b></li><li>limite novo: <b>Fundos, 0% a 10%</b></li></ul>`, false);
+  }
+  const next = steps[idx + 1], prev = steps[idx - 1];
+  html += `</div><aside class="aside"><div class="quote"><b>v3 · rascunho</b><span>GLINA-USD-01 · copiada da v2</span></div>
+  <dl class="kv"><dt>Risco</dt><dd>3 de 5</dd><dt>Retorno-alvo</dt><dd>SOFR + 2,50%</dd><dt>Classes</dt><dd>2</dd><dt>Limites</dt><dd>4</dd></dl>
+  <div class="kicker" style="margin-top:22px">Para publicar</div>
+  <ul class="checks"><li class="ok"><i class="ti ti-circle-check"></i>Campos obrigatórios preenchidos</li><li class="err"><i class="ti ti-alert-circle"></i>Limite de Fundos fora das classes elegíveis</li><li class="${step === 'publish' ? 'ok' : ''}"><i class="ti ti-${step === 'publish' ? 'circle-check' : 'circle-dashed'}"></i>Vigência depois da v2 e motivo</li></ul></aside></div>
+  ${bar(`Etapa ${idx + 1} de 4 · rascunho salvo às 19:52`,
+    `<a class="btn" href="?view=detail&tab=mandate">Sair</a>${prev ? `<a class="btn" href="?view=mandate&step=${prev[0]}"><i class="ti ti-arrow-left"></i>Voltar</a>` : ''}<button type="button" class="btn">Salvar rascunho</button>${next ? `<a class="btn primary" href="?view=mandate&step=${next[0]}">Continuar<i class="ti ti-arrow-right"></i></a>` : '<button type="button" class="btn primary" data-confirm="publish">Publicar v3</button>'}`)}
+  </form>`;
+}
+
+document.getElementById('content').innerHTML = html;
+document.getElementById('crumb').innerHTML = crumb;
+
+const DIALOGS = {
+  publish: ['Publicar a v3?', 'A partir de 27/01/2027 a v3 vale para todos os clientes do GLINA-USD-01, inclusive quem já comprou. Depois de publicada, a versão não muda: para corrigir, abra uma v4.', 'Publicar'],
+  expire: ['Expirar a apólice AP-2026-001?', 'O produto GLINA-USD-01 passa para Expirado junto e depois só pode ser encerrado. Não dá para desfazer.', 'Expirar apólice e produto', true],
+  close: ['Encerrar o produto?', 'Encerrado é definitivo: o produto não volta a nenhum outro status. O histórico continua disponível.', 'Encerrar produto', true],
+  inactive: ['Inativar o produto?', 'O produto para de aceitar novas aplicações até ser ativado de novo.', 'Inativar'],
+  archive: ['Arquivar o documento?', 'O arquivo continua guardado e aparece no histórico, mas sai da lista de documentos em uso.', 'Arquivar'],
+  'activate-blocked': ['Ainda não dá para ativar', 'Falta cadastrar uma apólice vigente e publicar o regulamento v1.', null],
+};
+const dialog = document.getElementById('confirm');
+document.querySelectorAll('[data-confirm]').forEach(b => b.onclick = e => {
+  e.preventDefault();
+  const [title, text, ok, danger] = DIALOGS[b.dataset.confirm];
+  const askReason = ok && b.dataset.confirm !== 'publish';
+  dialog.innerHTML = `<h2>${title}</h2><p>${text}</p>${askReason ? `<div class="f"><label>Motivo (opcional, fica no histórico)</label><textarea class="in" rows="2" style="height:auto;padding-top:10px"></textarea></div>` : ''}
+    <div class="actions"><button class="btn" value="cancel">${ok ? 'Cancelar' : 'Entendi'}</button>${ok ? `<button class="btn ${danger ? 'danger-btn' : 'primary'}">${ok}</button>` : ''}</div>`;
+  dialog.querySelectorAll('button').forEach(x => x.onclick = () => dialog.close());
+  dialog.showModal();
+});
+document.querySelectorAll('.chip').forEach(c => c.onclick = () => { c.classList.toggle('on'); c.querySelector('i').className = 'ti ti-' + (c.classList.contains('on') ? 'check' : 'plus'); });
+document.querySelectorAll('.risk span').forEach(s => s.onclick = () => { document.querySelectorAll('.risk span').forEach(x => x.classList.remove('on')); s.classList.add('on'); });
+</script>
+</body></html>

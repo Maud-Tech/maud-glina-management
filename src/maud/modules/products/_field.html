@@ -1,0 +1,6 @@
+<div class="f{% if full %} full{% endif %}{% if field.errors %} bad{% endif %}">
+  <label for="{{ field.id_for_label }}">{{ label }}{% if required %} <em>*</em>{% endif %}</label>
+  {% if suffix %}<div class="suffix">{{ field }}<em>{{ suffix }}</em></div>{% elif prefix %}<div class="prefix"><span>{{ prefix }}</span>{{ field }}</div>{% else %}{{ field }}{% endif %}
+  {% for error in field.errors %}<div class="msg">{{ error }}</div>{% empty %}{% if help %}<div class="msg">{{ help }}</div>{% endif %}{% endfor %}
+  {% if was %}<div class="changed">Na v{{ previous_version }}: <s>{{ was }}</s></div>{% endif %}
+</div>

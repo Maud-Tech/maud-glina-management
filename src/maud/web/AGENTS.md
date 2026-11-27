@@ -11,7 +11,7 @@ Não tem model nem regra de negócio. Lê dos módulos só pelo `api.py` deles.
 - `context_processors.py`: toda tela recebe `shell` (identidade da gestora, tema, menu).
 - `views.py`, `urls.py`: entrar, sair, painel.
 - `static/web/app.css`: todos os componentes. Tela não traz CSS próprio.
-- `static/web/app.js`: troca de tema e prévia da cor.
+- `static/web/app.js`: troca de tema, prévia da cor, menu recolhível, confirmação (`data-dialog`), linhas repetidas (`data-row-add`/`data-row-remove`) e alvo do limite filtrado pela dimensão.
 - `static/web/vendor/`: htmx 2.0.4, fonte Jost e ícones Tabler 3.19.0, com as licenças. Nada vem de CDN.
 
 ## Invariantes
