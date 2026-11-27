@@ -2,6 +2,7 @@
 # mas precisam ir com o container: ADR "Migrations fora do git"). Não ignore migrations/ aqui.
 .git/
 .venv/
+venv/
 .env
 .cache/
 __pycache__/

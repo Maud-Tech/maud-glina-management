@@ -1,6 +1,7 @@
 __pycache__/
 *.py[cod]
 .venv/
+venv/
 .env
 # caches de ruff, mypy, pytest e hypothesis
 .cache/
