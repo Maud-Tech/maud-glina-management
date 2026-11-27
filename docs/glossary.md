@@ -43,8 +43,7 @@ Os termos já implementados têm nome em inglês definido. Os demais permanecem 
 | Fundo | `Fund` | Classe de cotas negociável cadastrada como ativo independente. |
 | Ativo genérico | `GenericAsset` | Ativo temporário ainda não normalizado para uma família definitiva. |
 | Classificação do ativo | `AssetClassification` | Classe estratégica, subclasse, risco e liquidez de um ativo. |
-| Fonte de preço | `PriceSource` | Origem de uma observação de preço. |
-| Preço do ativo | `AssetPrice` | Preço de um ativo em uma data, tipo e fonte. |
+| Preço do ativo | `AssetPrice` | Preço de um ativo em uma data e tipo (MKT, MD ou CURVE), sem cadastro de fontes. |
 | Preço de mercado | `AssetPrice.Type.MKT` | Preço de mercado de referência disponível para o ativo. |
 | Última cotação disponível | `AssetPrice.Type.MD` | Última cotação do dia para ativo negociado sem preço médio ANBIMA. |
 | Preço de curva | `AssetPrice.Type.CURVE` | Preço de dívida sem marcação a mercado. |

@@ -15,7 +15,6 @@ from maud.modules.assets.models import (
     CashAsset,
     DebtInstrument,
     GenericAsset,
-    PriceSource,
     TradingVenue,
 )
 
@@ -176,15 +175,13 @@ def test_normalized_generic_asset_requires_destination(asset: Asset) -> None:
         )
 
 
-def test_price_is_unique_by_asset_date_type_and_source(asset: Asset, usd: Any) -> None:
-    source = PriceSource.objects.create(code="MANUAL", name="Manual", priority=1)
+def test_price_is_unique_by_asset_date_and_type(asset: Asset, usd: Any) -> None:
     price = {
         "asset": asset,
         "price_date": date(2026, 11, 26),
         "price": Decimal("10.000000000000"),
         "currency": usd,
         "price_type": AssetPrice.Type.MKT,
-        "source": source,
     }
     AssetPrice.objects.create(**price)
 

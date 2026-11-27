@@ -47,10 +47,21 @@ def registration_edit(request: HttpRequest, resource: str, pk: str | None = None
         data=request.POST if request.method == "POST" else None,
         instance=instance,
         variant=variant,
+        identifier_rights={
+            action: request.user.has_perm("assets." + action + "_assetidentifier")
+            and (can_edit or action == "view")
+            for action in ("view", "add", "change", "delete")
+        },
     )
     list_url = reverse("assets_" + resource + "_list")
     key = request.POST.get("request_key", "") if request.method == "POST" else str(uuid.uuid4())
     if request.method == "POST":
+        if (
+            resource == "assets"
+            and any(name.startswith("identifiers-") for name in request.POST)
+            and not any(bundle.identifier_rights.values())
+        ):
+            raise PermissionDenied
         try:
             execute(
                 SaveRegistrationCommand(
@@ -80,11 +91,16 @@ def registration_edit(request: HttpRequest, resource: str, pk: str | None = None
             if form:
                 for form_field in form.fields.values():
                     form_field.disabled = True
+        if bundle.identifiers is not None:
+            for item in bundle.identifiers.forms:
+                for form_field in item.fields.values():
+                    form_field.disabled = True
     related_links = []
     if instance is not None:
         for key_name, related in REGISTRY.items():
             if (
-                related.parent_field
+                key_name != "identifiers"
+                and related.parent_field
                 and related.model._meta.get_field(related.parent_field).related_model == spec.model
             ) and request.user.has_perm("assets.view_" + related.model._meta.model_name):
                 related_links.append(
@@ -115,6 +131,13 @@ def registration_edit(request: HttpRequest, resource: str, pk: str | None = None
             "current_menu": "assets_" + resource + "_list",
         },
         status=422
-        if bundle.main.errors or (bundle.detail is not None and bundle.detail.errors)
+        if (
+            bundle.main.errors
+            or (bundle.detail is not None and bundle.detail.errors)
+            or (
+                bundle.identifiers is not None
+                and (bundle.identifiers.errors or bundle.identifiers.non_form_errors())
+            )
+        )
         else 200,
     )

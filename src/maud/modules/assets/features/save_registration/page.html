@@ -14,6 +14,20 @@
   <div class="body"><div>
     <section class="sec"><div><h2>Identificação</h2><p class="hint">Campos com * são obrigatórios.</p></div><div>{% include "web/_registration_fields.html" with form=bundle.main %}</div></section>
     {% if bundle.detail %}<section class="sec"><div><h2>Dados específicos</h2><p class="hint">Detalhes da natureza ou família escolhida.</p></div><div>{% include "web/_registration_fields.html" with form=bundle.detail %}</div></section>{% endif %}
+    {% if bundle.identifiers is not None %}
+    <section class="sec"><div><h2>Identificadores</h2><p class="hint">Opcional. Adicione ISIN, CUSIP e outros códigos deste ativo.</p></div>
+      <div data-registration-formset>
+        {{ bundle.identifiers.management_form }}
+        {% if bundle.identifiers.non_form_errors %}<div class="notice error" role="alert">{{ bundle.identifiers.non_form_errors }}</div>{% endif %}
+        <div data-formset-items>{% for item in bundle.identifiers %}
+          <fieldset class="registration-related-item"><legend>Identificador {{ forloop.counter }}</legend>{% include "web/_registration_fields.html" with form=item %}</fieldset>
+        {% endfor %}</div>
+        {% if can_edit and bundle.identifiers.registration_can_add %}
+        <template data-formset-template><fieldset class="registration-related-item"><legend>Novo identificador</legend>{% include "web/_registration_fields.html" with form=bundle.identifiers.empty_form %}</fieldset></template>
+        <button type="button" class="btn" data-formset-add>Adicionar identificador</button>{% endif %}
+      </div>
+    </section>
+    {% endif %}
   </div><aside class="aside"><div class="quote"><b>{{ summary }}</b><span>{{ title }}</span></div><div class="preview"><span>Confira os dados antes de salvar.</span><span>Salvar e cancelar retornam à lista de {{ title|lower }}.</span>{% for link in related_links %}<a href="{{ link.url }}">{{ link.title }} →</a>{% endfor %}</div></aside></div>
   <footer class="bar"><a class="btn" href="{{ list_url }}">Voltar à lista</a><div class="grow"></div><a class="btn" href="{{ list_url }}">Cancelar</a>{% if can_edit %}<button class="btn primary" type="submit">Salvar cadastro</button>{% endif %}</footer>
 </form>

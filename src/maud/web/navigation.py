@@ -37,15 +37,18 @@ MENU = (
         "Ativos",
         (
             MenuItem("Cadastro de ativos", "assets_assets_list", "assets.view_asset"),
-            MenuItem("Casas de negociação", "assets_venues_list", "assets.view_tradingvenue"),
-            MenuItem("Identificadores", "assets_identifiers_list", "assets.view_assetidentifier"),
-            MenuItem("Listagens", "assets_listings_list", "assets.view_assetlisting"),
             MenuItem(
                 "Classificações", "assets_classifications_list", "assets.view_assetclassification"
             ),
-            MenuItem("Fontes de preço", "assets_sources_list", "assets.view_pricesource"),
             MenuItem("Preços", "assets_prices_list", "assets.view_assetprice"),
             MenuItem("Eventos de mercado", "assets_events_list", "assets.view_assetevent"),
+        ),
+    ),
+    MenuGroup(
+        "Negociação",
+        (
+            MenuItem("Casas de negociação", "assets_venues_list", "assets.view_tradingvenue"),
+            MenuItem("Listagens", "assets_listings_list", "assets.view_assetlisting"),
         ),
     ),
     MenuGroup(

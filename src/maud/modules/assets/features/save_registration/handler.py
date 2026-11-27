@@ -42,6 +42,28 @@ def execute(command: SaveRegistrationCommand) -> RegistrationResponse:
                 bundle.add_detail_errors(error)
                 raise
             detail.save()
+        if bundle.identifiers is not None:
+            formset = bundle.identifiers
+            items = formset.save(commit=False)
+            for removed in formset.deleted_objects:
+                removed.delete()
+            changed_ids = [item.pk for item in items if not item._state.adding]
+            formset.model.objects.filter(asset=record, pk__in=changed_ids, is_primary=True).update(
+                is_primary=False
+            )
+            for item in items:
+                item.asset = record
+                try:
+                    item.full_clean()
+                except ValidationError as error:
+                    target = next(form for form in formset.forms if form.instance is item)
+                    for name, errors in getattr(
+                        error, "message_dict", {"__all__": error.messages}
+                    ).items():
+                        for message in errors:
+                            target.add_error(name if name in target.fields else None, message)
+                    raise
+                item.save()
         # 3. Cadastro local: nenhum fato é publicado para sistemas externos.
         return RegistrationResponse(id=str(record.pk))
 

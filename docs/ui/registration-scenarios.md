@@ -9,10 +9,10 @@ Os dados são ilustrativos. As etapas e o botão salvar ainda não persistem dad
 
 - Pessoas e entidades: moedas, países, pessoas físicas e jurídicas. Endereços e contatos
   ficam no detalhe da pessoa, evitando registros sem identidade associada.
-- Ativos: cadastro das cinco famílias, casas de negociação, fontes de preço, preços e eventos.
+- Ativos: cadastro das cinco famílias, casas de negociação, preços e eventos.
 - Identificadores, listagens e classificação ficam no detalhe do ativo.
 - Listas: busca, filtros, paginação, criação e edição conforme permissão.
-- Moedas, países, casas e fontes: formulário curto, em uma tela.
+- Moedas, países e casas: formulário curto, em uma tela.
 - Pessoa: identificação, endereços, contatos e conferência.
 - Ativo: identificação, detalhes da família, identificadores/listagens e conferência.
 - Preços e eventos: lista global com filtro por ativo e acesso pelo detalhe do ativo.
@@ -41,7 +41,7 @@ Os dados são ilustrativos. As etapas e o botão salvar ainda não persistem dad
 - test_identifier_type_and_value_are_unique — identificadores duplicados são recusados.
 - test_debt_validates_dates_and_positive_minimum_lot — dívida valida vencimento, perpétuo e lote.
 - test_fund_validates_parent_and_nonnegative_fees — fundo valida vínculo com pai e taxas.
-- test_price_validates_type_source_and_unique_date — preço respeita tipos e unicidade do model.
+- test_price_validates_type_and_unique_date — preço é único por ativo, data e tipo (MKT, MD ou CURVE).
 - test_event_uses_cum_price_and_com_date — evento apresenta Preço COM e Data COM.
 - test_repeated_registration_request_creates_once — repetir a chave de idempotência não duplica.
 - test_invalid_form_keeps_values_and_shows_field_errors — recusa preserva dados e sinaliza o campo.

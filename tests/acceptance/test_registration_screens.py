@@ -21,7 +21,6 @@ ROUTES = [
     ("entities", "contacts"),
     ("assets", "assets"),
     ("assets", "venues"),
-    ("assets", "sources"),
     ("assets", "identifiers"),
     ("assets", "listings"),
     ("assets", "classifications"),
@@ -280,7 +279,6 @@ def asset(country):
             {"main-code": "BR", "main-name": "Brasil", "main-currency": "USD"},
         ),
         ("assets", "venues", {"main-code": "NYSE", "main-name": "NYSE", "main-country": "US"}),
-        ("assets", "sources", {"main-code": "LOCAL", "main-name": "Local", "main-priority": "1"}),
     ],
 )
 def test_auxiliary_registrations_save_and_return_to_own_list(
@@ -295,16 +293,14 @@ def test_auxiliary_registrations_save_and_return_to_own_list(
 
 
 def test_price_and_event_use_correct_labels_and_validate_unique_values(operator, asset):
-    from maud.modules.assets.models import AssetEvent, AssetPrice, PriceSource
+    from maud.modules.assets.models import AssetEvent, AssetPrice
 
-    source = PriceSource.objects.create(code="MANUAL", name="Manual", priority=1)
     fields = {
         "main-asset": str(asset.pk),
         "main-price_date": "2026-11-27",
         "main-price": "123.456789012345",
         "main-currency": "USD",
         "main-price_type": "MD",
-        "main-source": str(source.pk),
     }
     response, _, _ = submit(operator, "assets", "prices", fields)
     assert response.status_code == 302

@@ -13,7 +13,6 @@ from maud.modules.assets.models import (
     Equity,
     Fund,
     GenericAsset,
-    PriceSource,
     TradingVenue,
 )
 
@@ -95,16 +94,10 @@ class AssetClassificationAdmin(ReadOnlyAdmin):
     list_filter = ("asset_class", "liquidity_type", "classification_source")
 
 
-@admin.register(PriceSource)
-class PriceSourceAdmin(ReadOnlyAdmin):
-    list_display = ("code", "name", "priority", "active")
-    search_fields = ("code", "name")
-
-
 @admin.register(AssetPrice)
 class AssetPriceAdmin(ReadOnlyAdmin):
-    list_display = ("asset", "price_date", "price", "currency", "price_type", "source")
-    list_filter = ("price_type", "source", "currency")
+    list_display = ("asset", "price_date", "price", "currency", "price_type")
+    list_filter = ("price_type", "currency")
 
 
 @admin.register(AssetEvent)

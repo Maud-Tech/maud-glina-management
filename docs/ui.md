@@ -78,6 +78,15 @@ A gestora escolhe **uma cor** (`--brand`). Tudo o mais é fixo ou derivado dela 
 
 ## 6. Formulário de cadastro
 
+Preços usam apenas os tipos MKT, MD e CURVE (curva), com um registro por ativo,
+data e tipo. Não há campo de fonte nem cadastro de fornecedores de preço.
+
+Casas de negociação e Listagens compartilham o grupo recolhível **Negociação**
+do menu lateral, com telas independentes e permissões próprias.
+
+Identificadores (ISIN, CUSIP, etc.) ficam numa seção opcional dentro do formulário
+do ativo. São salvos junto dele e não possuem item próprio no menu lateral.
+
 Os grupos do menu lateral são expansíveis/recolhíveis por clique ou teclado
 (`details/summary`). A preferência fica no navegador por usuário e por grupo.
 Ao navegar, o grupo da tela atual abre automaticamente. Sem JavaScript ou storage,

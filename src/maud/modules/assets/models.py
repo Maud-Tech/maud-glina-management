@@ -511,21 +511,8 @@ class AssetClassification(TimestampedModel):
         return f"{self.asset}:{self.asset_class}"
 
 
-class PriceSource(models.Model):
-    """Origem de uma observação de preço."""
-
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    code = models.CharField(max_length=30, unique=True)
-    name = models.CharField(max_length=100)
-    priority = models.PositiveSmallIntegerField()
-    active = models.BooleanField(default=True)
-
-    def __str__(self) -> str:
-        return self.code
-
-
 class AssetPrice(models.Model):
-    """Preço de um ativo para uma data, tipo e fonte."""
+    """Preço de um ativo para uma data e tipo (mercado, MD ou curva)."""
 
     class Type(models.TextChoices):
         MKT = "MKT", "Mercado"
@@ -542,14 +529,13 @@ class AssetPrice(models.Model):
         related_name="asset_prices",
     )
     price_type = models.CharField(max_length=20, choices=Type.choices)
-    source = models.ForeignKey(PriceSource, on_delete=models.PROTECT, related_name="prices")
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["asset", "price_date", "price_type", "source"],
-                name="uq_asset_price_date_type_source",
+                fields=["asset", "price_date", "price_type"],
+                name="uq_asset_price_date_type",
             ),
             models.CheckConstraint(
                 condition=Q(price__gte=0),

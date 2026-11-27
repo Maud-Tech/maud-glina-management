@@ -4,10 +4,11 @@ from __future__ import annotations
 
 import contextlib
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, cast
 
 from django import forms
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.forms.models import BaseModelFormSet
 
 from maud.modules.assets.models import (
     Asset,
@@ -21,7 +22,6 @@ from maud.modules.assets.models import (
     Equity,
     Fund,
     GenericAsset,
-    PriceSource,
     TradingVenue,
 )
 from maud.modules.entities.api import reference_queryset
@@ -120,11 +120,9 @@ LABELS = {
     "liquidity_days": "Liquidez (dias)",
     "classification_source": "Origem da classificação",
     "risk_factors": "Fatores de risco (JSON)",
-    "priority": "Prioridade",
     "price_date": "Data do preço",
     "price": "Preço",
     "price_type": "Tipo de preço",
-    "source": "Fonte de preço",
     "event_type": "Tipo de evento",
     "event_date": "Data COM",
     "settlement_date": "Data de liquidação",
@@ -239,6 +237,69 @@ def build_form(
     return form
 
 
+class IdentifierFormSet(BaseModelFormSet):  # type: ignore[type-arg]
+    """Identificadores opcionais; valida duplicidade e principal por tipo."""
+
+    registration_can_add: bool = False
+
+    def add_fields(self, form: Any, index: Any) -> None:
+        super().add_fields(form, index)
+        for name, form_field in form.fields.items():
+            form_field.widget.attrs["class"] = "in"
+            if name == "value":
+                form_field.strip = False
+            if name == "DELETE":
+                form_field.label = "Remover este identificador"
+
+    def clean(self) -> None:
+        super().clean()
+        if any(self.errors):
+            return
+        primary_types: set[str] = set()
+        for item in self.forms:
+            values = item.cleaned_data
+            if not values or values.get("DELETE") or not values.get("is_primary"):
+                continue
+            kind = values.get("identifier_type", "")
+            if kind in primary_types:
+                item.add_error("is_primary", "Já existe um identificador principal deste tipo.")
+            primary_types.add(kind)
+
+
+def identifier_formset(*, data: Any, instance: Any, rights: Any) -> Any:
+    if not any(rights.values()):
+        return None
+    if data is not None and not any(name.startswith("identifiers-") for name in data):
+        return None  # Clientes anteriores preservam os identificadores existentes.
+    records = (
+        AssetIdentifier.objects.filter(asset=instance)
+        if instance
+        else AssetIdentifier.objects.none()
+    )
+    factory = forms.modelformset_factory(
+        AssetIdentifier,
+        form=RegistrationForm,
+        formset=IdentifierFormSet,
+        fields=("identifier_type", "value", "is_primary"),
+        labels=LABELS,
+        extra=1 if rights.get("add") else 0,
+        can_delete=bool(rights.get("delete")),
+        max_num=100,
+        validate_max=True,
+    )
+    result = cast(IdentifierFormSet, factory(data=data, queryset=records, prefix="identifiers"))
+    result.registration_can_add = bool(rights.get("add"))
+    for item in result.forms:
+        id_field = item.fields["id"]
+        if isinstance(id_field, forms.ModelChoiceField):
+            id_field.queryset = records
+        if not item.instance._state.adding and not rights.get("change"):
+            for name, form_field in item.fields.items():
+                if name not in {"id", "DELETE"}:
+                    form_field.disabled = True
+    return result
+
+
 @dataclass
 class RegistrationForms:
     resource: str
@@ -246,6 +307,8 @@ class RegistrationForms:
     main: Any
     detail: Any = None
     identity: str = "new"
+    identifiers: Any = None
+    identifier_rights: Any = field(default_factory=dict)
 
     def is_valid(self) -> bool:
         main_valid = self.main.is_valid()
@@ -257,7 +320,18 @@ class RegistrationForms:
             and main_valid
         ):
             self.detail.instance.currency = self.main.cleaned_data["currency"]
-        return main_valid and detail_valid
+        identifiers_valid = True
+        if self.identifiers is not None:
+            identifiers_valid = self.identifiers.is_valid()
+            for item in self.identifiers.forms:
+                if (
+                    item.has_changed()
+                    and item.instance._state.adding
+                    and not self.identifier_rights.get("add")
+                ):
+                    item.add_error(None, "Você não tem permissão para adicionar identificadores.")
+                    identifiers_valid = False
+        return main_valid and detail_valid and identifiers_valid
 
     def add_detail_errors(self, error: ValidationError) -> None:
         for name, errors in getattr(error, "message_dict", {"__all__": error.messages}).items():
@@ -271,6 +345,7 @@ def registration_forms(
     data: Any = None,
     instance: Any = None,
     variant: str = "",
+    identifier_rights: Any = None,
 ) -> RegistrationForms:
     spec = REGISTRY[resource]
     main = build_form(spec.model, data=data, instance=instance)
@@ -294,9 +369,15 @@ def registration_forms(
         )
         if instance is not None:
             setattr(detail.instance, spec.detail_parent, instance)
-    return RegistrationForms(
+    bundle = RegistrationForms(
         resource, spec, main, detail, str(instance.pk) if instance is not None else "new"
     )
+    if resource == "assets" and identifier_rights is not None:
+        bundle.identifier_rights = identifier_rights
+        bundle.identifiers = identifier_formset(
+            data=data, instance=instance, rights=identifier_rights
+        )
+    return bundle
 
 
 REGISTRY = {
@@ -317,9 +398,6 @@ REGISTRY = {
     ),
     "venues": RegistrationSpec(
         TradingVenue, "Casas de negociação", ("code", "name", "country"), ("code", "name")
-    ),
-    "sources": RegistrationSpec(
-        PriceSource, "Fontes de preço", ("code", "name", "priority"), ("code", "name")
     ),
     "identifiers": RegistrationSpec(
         AssetIdentifier,
@@ -345,8 +423,8 @@ REGISTRY = {
     "prices": RegistrationSpec(
         AssetPrice,
         "Preços",
-        ("asset", "price_date", "price", "price_type", "source"),
-        ("asset__name", "source__code"),
+        ("asset", "price_date", "price", "price_type"),
+        ("asset__name",),
         parent_field="asset",
     ),
     "events": RegistrationSpec(

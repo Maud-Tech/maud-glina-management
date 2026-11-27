@@ -15,6 +15,34 @@ Modelo:
 
 ---
 
+## 2026-11-27 · assets · preços sem cadastro de fontes
+- **O que mudou:** removidos o model PriceSource, a FK AssetPrice.source e o cadastro
+  de fontes no menu, formulários e admin. Preço passa a ser único por ativo/data/tipo,
+  preservando os tipos MKT, MD e CURVE.
+- **Por quê:** iniciar a precificação como no MCore, sem distinção por fornecedor.
+- **Testes:** cenários de aceitação existentes atualizados com autorização explícita
+  do usuário no chat: remoção do cadastro de fontes e criação de preço sem source.
+- **Pendente / atenção:** humano deve gerar/aplicar migration para excluir a FK e a
+  tabela e substituir a constraint. Banco local conferido antes da alteração: zero
+  fontes e zero preços; outros ambientes devem conferir duplicatas antes da migration.
+- **Autor:** Felipe Linhares + Codex
+
+## 2026-11-27 · web · menu de negociação
+- **O que mudou:** Casas de negociação e Listagens ficam juntas no grupo recolhível
+  Negociação, com suas próprias telas e permissões.
+- **Por quê:** reunir os cadastros relacionados à negociação no mesmo menu.
+- **Pendente / atenção:** sem mudança de model ou migration.
+- **Autor:** Felipe Linhares + Codex
+
+## 2026-11-27 · assets · identificadores dentro do ativo
+- **O que mudou:** formulário do ativo passa a incluir identificadores opcionais,
+  com múltiplos itens, edição e remoção. Item independente sai do menu lateral
+  e dos links de vínculos no detalhe; gravação é atômica com o ativo.
+- **Por quê:** manter a identificação do ativo no mesmo fluxo de cadastro.
+- **Pendente / atenção:** sem mudança de model ou migration; permissões específicas
+  e unicidade de códigos/principais continuam validadas no servidor.
+- **Autor:** Felipe Linhares + Codex
+
 ## 2026-11-27 · web · grupos do menu recolhíveis
 - **O que mudou:** grupos do menu abrem e fecham independentemente, com indicador,
   suporte nativo a teclado e preferência salva no navegador por usuário.
