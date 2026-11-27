@@ -1,6 +1,6 @@
 # Portas, banco, usuário e senha vêm TODOS do .env (copie o .env.example). Nada de porta repetida aqui.
 # Mesma porta dentro e fora do container: o Postgres escuta em POSTGRES_PORT e a API em API_PORT,
-# então o runserver na máquina e os containers usam o mesmo .env; só o host muda (localhost x db).
+# então o runserver na máquina e os containers usam o mesmo .env; só o host muda (127.0.0.1 x db).
 # Na máquina que já roda mcore (5433) e fidccopobras (5431), use portas livres no .env.
 
 x-app: &app

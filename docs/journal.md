@@ -15,6 +15,12 @@ Modelo:
 
 ---
 
+## 2026-11-27 · projeto · banco local em 127.0.0.1, não localhost
+- **O que mudou:** `POSTGRES_HOST` do `.env.example` (e o padrão do `settings.py`) passou de `localhost` para `127.0.0.1`.
+- **Por quê:** o banco só escuta no IPv4 da própria máquina. No Windows com Docker Desktop, `localhost` tenta o IPv6 (`::1`) primeiro e a conexão fica pendurada: os testes travavam já no primeiro teste com banco. Com `127.0.0.1`, os 126 testes rodaram contra Postgres em cerca de 1 minuto (primeira rodada com banco real, pendente desde a entrega das telas).
+- **Pendente / atenção:** quem já tem `.env` com `POSTGRES_HOST=localhost` e usa Windows deve trocar para `127.0.0.1`. O CI (Linux) não é afetado.
+- **Autor:** Victor (+ IA)
+
 ## 2026-11-27 · assets · preços sem cadastro de fontes
 - **O que mudou:** removidos o model PriceSource, a FK AssetPrice.source e o cadastro
   de fontes no menu, formulários e admin. Preço passa a ser único por ativo/data/tipo,

@@ -107,7 +107,7 @@ TEMPLATES = [
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "HOST": _env("POSTGRES_HOST", "localhost"),
+        "HOST": _env("POSTGRES_HOST", "127.0.0.1"),
         "PORT": _env("POSTGRES_PORT", "5435"),
         "NAME": _env("POSTGRES_DB", "maud_glina_management"),
         "USER": _env("POSTGRES_USER", "maud"),
