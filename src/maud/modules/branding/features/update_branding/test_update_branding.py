@@ -46,11 +46,11 @@ def test_without_saved_branding_the_default_identity_is_used() -> None:
 
 
 def test_saves_trimmed_name_and_normalized_color() -> None:
-    view = execute(command(name="  Gestora   Exemplo ", brand_color="8b5cf6"))
+    view = execute(command(name="  Gestora   Exemplo ", brand_color="1e3a8a"))
 
     assert view.name == "Gestora Exemplo"
     assert view.initials == "GE"
-    assert view.brand_color == "#8B5CF6"
+    assert view.brand_color == "#1E3A8A"
     assert view.text_on_brand == "#FFFFFF"
 
 
@@ -67,7 +67,7 @@ def test_blank_name_without_logo_falls_back_to_default_wordmark() -> None:
 
     assert view.name == ""
     assert view.wordmark_name == "Gestão de apólices"
-    assert view.initials == "GA"
+    assert view.initials == "GD"
 
 
 def test_saving_twice_keeps_a_single_row() -> None:

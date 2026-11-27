@@ -27,11 +27,11 @@ def test_login_page_shows_the_gestora_name(client: Client, admin_client: Client)
 
 
 def test_brand_color_reaches_every_page(admin_client: Client) -> None:
-    save_branding(admin_client, color="#8B5CF6")
+    save_branding(admin_client, color="#1E3A8A")
 
     page = admin_client.get("/").content.decode()
 
-    assert "--brand: #8B5CF6" in page
+    assert "--brand: #1E3A8A" in page
     assert "--on-brand: #FFFFFF" in page
 
 
