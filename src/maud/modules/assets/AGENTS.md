@@ -24,7 +24,14 @@ Depende de: `entities` para moedas, países e entidades que exercem papéis no c
 _(vazia até outro módulo precisar consultar ativos)_
 
 ## Slices
-_(nenhuma; esta entrega cria somente os models)_
+- `list_registrations`: consulta autenticada, busca, filtros e paginação por cadastro.
+- `save_registration`: criação/edição transacional e idempotente; formulário separado
+  retorna à lista do próprio cadastro. Natureza/família fixa após a criação.
+
+## Telas
+`pages.py` expõe lista, novo e detalhe/edição por cadastro, com permissões Django
+`view`, `add` e `change`. Vínculos também são acessíveis pelo detalhe do registro pai.
+Nenhuma tela faz exclusão física.
 
 ## domain/
 _(vazio até a primeira slice; as regras puras serão centralizadas aqui)_

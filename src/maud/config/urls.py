@@ -20,4 +20,6 @@ urlpatterns = [
     # Telas (ADR 0010): a casca e, por módulo, o pages.py com as telas das slices.
     path("", include("maud.web.urls")),
     path("", include("maud.modules.branding.pages")),
+    path("", include("maud.modules.entities.pages")),
+    path("", include("maud.modules.assets.pages")),
 ]

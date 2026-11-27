@@ -1,9 +1,11 @@
-<aside class="side">
+<aside class="side" data-navigation-user="{{ user.pk }}">
   {% include "web/_wordmark.html" %}
   {% for group in shell.menu %}
-    <div class="kicker">{{ group.label }}</div>
-    <nav class="nav">
+    <details class="nav-group" data-navigation-group="{{ group.label|slugify }}"{% if group.active %} open data-navigation-active{% endif %}>
+    <summary class="kicker">{{ group.label }}<span class="nav-chevron" aria-hidden="true"></span></summary>
+    <nav class="nav" aria-label="{{ group.label }}">
       {% for item in group.items %}<a href="{% url item.url_name %}"{% if item.active %} class="on" aria-current="page"{% endif %}>{{ item.label }}</a>{% endfor %}
     </nav>
+    </details>
   {% endfor %}
 </aside>

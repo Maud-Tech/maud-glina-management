@@ -2,6 +2,35 @@
 (function () {
   "use strict";
   const root = document.documentElement;
+  // Grupos independentes; o grupo da rota atual fica aberto ao navegar.
+  document.querySelectorAll("[data-navigation-group]").forEach(function (group) {
+    const user = group.closest("[data-navigation-user]").dataset.navigationUser;
+    const key = "glina.navigation." + user + "." + group.dataset.navigationGroup;
+    try {
+      const saved = localStorage.getItem(key);
+      if (!group.hasAttribute("data-navigation-active") && saved !== null) {
+        group.open = saved === "true";
+      }
+    } catch (_) { /* O menu nativo continua funcionando sem armazenamento. */ }
+    group.addEventListener("toggle", function () {
+      try { localStorage.setItem(key, String(group.open)); }
+      catch (_) { /* Preferência indisponível neste navegador. */ }
+    });
+  });
+  document.addEventListener("click", function (event) {
+    const button = event.target.closest("[data-formset-add]");
+    if (!button) return;
+    const group = button.closest("[data-registration-formset]");
+    const total = group.querySelector('input[name$="-TOTAL_FORMS"]');
+    const maximum = group.querySelector('input[name$="-MAX_NUM_FORMS"]');
+    const index = Number(total.value);
+    if (index >= Number(maximum.value || 100)) return;
+    const template = group.querySelector("[data-formset-template]");
+    group.querySelector("[data-formset-items]").insertAdjacentHTML(
+      "beforeend", template.innerHTML.replaceAll("__prefix__", String(index))
+    );
+    total.value = index + 1;
+  });
 
   // Tema: cada pessoa escolhe; fica num cookie para o servidor já mandar a página certa.
   document.addEventListener("click", function (event) {

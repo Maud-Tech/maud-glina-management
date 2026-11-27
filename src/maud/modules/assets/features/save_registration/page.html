@@ -1,0 +1,20 @@
+{% extends "web/base.html" %}
+{% block title %}{{ title }} · {% if editing %}Detalhes{% else %}Novo cadastro{% endif %}{% endblock %}
+{% block crumb %}<a href="{{ list_url }}">{{ title }}</a> / <span>{% if editing %}Detalhes{% else %}Novo cadastro{% endif %}</span>{% endblock %}
+{% block content %}
+<h1>{% if editing %}Seu{% else %}Novo{% endif %} <mark>cadastro.</mark></h1>
+<p class="lead">{{ title }} · Preencha os campos e confira antes de salvar.</p>
+{% if variant_choices and not editing %}
+<form method="get" class="registration-toolbar">
+  <div class="f"><label for="choose-variant">Escolha a natureza / família antes de preencher</label><select class="in" name="variant" id="choose-variant">{% for value, label in variant_choices %}<option value="{{ value }}"{% if variant == value %} selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+  <button class="btn" type="submit">Usar este tipo</button>
+</form>{% endif %}
+<form method="post" class="registration-form">
+  {% csrf_token %}<input type="hidden" name="request_key" value="{{ request_key }}"><input type="hidden" name="variant" value="{{ variant }}">
+  <div class="body"><div>
+    <section class="sec"><div><h2>Identificação</h2><p class="hint">Campos com * são obrigatórios.</p></div><div>{% include "web/_registration_fields.html" with form=bundle.main %}</div></section>
+    {% if bundle.detail %}<section class="sec"><div><h2>Dados específicos</h2><p class="hint">Detalhes da natureza ou família escolhida.</p></div><div>{% include "web/_registration_fields.html" with form=bundle.detail %}</div></section>{% endif %}
+  </div><aside class="aside"><div class="quote"><b>{{ summary }}</b><span>{{ title }}</span></div><div class="preview"><span>Confira os dados antes de salvar.</span><span>Salvar e cancelar retornam à lista de {{ title|lower }}.</span>{% for link in related_links %}<a href="{{ link.url }}">{{ link.title }} →</a>{% endfor %}</div></aside></div>
+  <footer class="bar"><a class="btn" href="{{ list_url }}">Voltar à lista</a><div class="grow"></div><a class="btn" href="{{ list_url }}">Cancelar</a>{% if can_edit %}<button class="btn primary" type="submit">Salvar cadastro</button>{% endif %}</footer>
+</form>
+{% endblock %}

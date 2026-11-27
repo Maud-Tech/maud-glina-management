@@ -15,7 +15,9 @@ Três repositórios: `maud-glina-api` (porteiro, AWS), `maud-glina-liability` (a
 - **Versão publicada nunca é editada.** Reprocessar gera versão nova; a antiga fica gravada.
 - **Falta de informação sai como preliminar**, com as pendências nomeadas, nunca como estimativa escondida.
 
-**Situação:** módulos `entities` e `assets` com os models, ainda sem slices nem telas. A casca das telas (`web/`) e o módulo `branding` (Personalização) existem ([ADR 0010](docs/adr/0010-web-screens-white-label.md)).
+**Situação:** `entities` e `assets` possuem models e telas de listagem, criação e edição.
+Cada cadastro tem sua própria lista e o formulário retorna a ela ao salvar ou cancelar.
+A casca (`web/`) e `branding` seguem o [ADR 0010](docs/adr/0010-web-screens-white-label.md).
 
 ## Mapa (monolito modular; cada pasta tem seu AGENTS.md)
 

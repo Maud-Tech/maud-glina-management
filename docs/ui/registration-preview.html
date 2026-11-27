@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="dark">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cadastros · proposta Glina</title>
+<link rel="stylesheet" href="../../src/maud/web/static/web/app.css">
+<style>
+/* Somente protótipo. Componentes aprovados serão incorporados à casca. */
+.toolbar,.tabs,.actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.toolbar{margin:32px 0}.tabs{margin:30px 0}.tabs button{height:38px}.tabs button[aria-current=true]{background:var(--brand);color:var(--on-brand)}
+.body{grid-template-columns:minmax(0,1fr) 220px;gap:36px}.sec{grid-template-columns:165px minmax(0,1fr);gap:25px}.aside{border-left:1px solid var(--line);padding-left:24px}.nav{margin-bottom:18px}.nav a{padding-top:5px;padding-bottom:5px}.nav .sub{padding-left:28px;font-size:14px}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;margin:25px 0}th,td{text-align:left;border-bottom:1px solid var(--line);padding:18px 14px}th{font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:var(--muted)}td{font-weight:400}small{color:var(--muted)}.tag{border:1px solid var(--line-2);border-radius:30px;padding:4px 12px;font-size:12px}.bar{margin-top:auto}.prototype{padding:8px 0;color:var(--muted);font-size:12px}.in option{background:var(--bg)}button:focus-visible,a:focus-visible{outline:2px solid var(--brand);outline-offset:4px}
+@media(max-width:1100px){.body{grid-template-columns:1fr}.aside{display:none}.sec{grid-template-columns:1fr}.main{padding:24px}.bar{margin:20px -24px 0;padding:18px 24px}}
+@media(max-width:700px){.app{grid-template-columns:1fr}.side{display:none}h1{font-size:38px}.grid{grid-template-columns:1fr}.who{display:none}}
+</style></head>
+<body><div class="app"><aside class="side">
+<a class="wordmark" href="?view=list"><span class="mark">M</span><b>MAUD<br><small>Gestão de ativos</small></b></a>
+<div class="kicker">Visão geral</div><nav class="nav"><a href="?view=list">Painel</a></nav>
+<div class="kicker">Pessoas e entidades</div><nav class="nav">
+<a href="?view=catalog&catalog=Moedas">Moedas</a><a href="?view=catalog&catalog=Países">Países</a><a data-nav="person" href="?view=person">Pessoas físicas e jurídicas</a></nav>
+<div class="kicker">Ativos</div><nav class="nav">
+<a data-nav="list" href="?view=list">Cadastro de ativos</a><a class="sub" href="?view=asset">Novo ativo</a>
+<a href="?view=catalog&catalog=Casas de negociação">Casas de negociação</a>
+<a href="?view=catalog&catalog=Fontes de preço">Fontes de preço</a>
+<a href="?view=catalog&catalog=Preços">Preços</a><a href="?view=catalog&catalog=Eventos">Eventos de mercado</a></nav>
+<div class="kicker">Administração</div><nav class="nav"><a href="?view=catalog&catalog=Personalização">Personalização</a></nav>
+<div class="side-foot">Cadastros offshore<br>Glina Management</div></aside>
+<main class="main"><header class="top"><div class="crumb" id="crumb"></div><div class="grow"></div>
+<button class="btn" id="theme" type="button">Alternar tema</button><div class="who"><i class="av">FL</i>Felipe Linhares</div></header>
+<div class="prototype">PROPOSTA VISUAL · dados ilustrativos · sem gravação</div><div id="content"></div>
+<footer class="bar"><span class="note">Protótipo navegável dos cadastros</span><div class="grow"></div><a class="btn" href="?view=list">Voltar à lista</a><button class="btn primary" type="button" id="primary">Salvar cadastro</button></footer>
+</main></div>
+<script>
+const params=new URLSearchParams(location.search), view=params.get('view')||'list';
+document.documentElement.dataset.theme=params.get('theme')||'dark';
+document.getElementById('theme').onclick=()=>{document.documentElement.dataset.theme=document.documentElement.dataset.theme==='dark'?'light':'dark'};
+const field=(label,value='',options=null)=>'<div class="f"><label>'+label+'</label>'+(options?'<select class="in">'+options.map(v=>'<option>'+v+'</option>').join('')+'</select>':'<input class="in" value="'+value+'">')+'</div>';
+const section=(title,hint,fields)=>'<section class="sec"><div><h2>'+title+'</h2><p class="hint">'+hint+'</p></div><div class="grid">'+fields+'</div></section>';
+const aside=(title,text)=>'<aside class="aside"><div class="quote"><b>'+title+'</b><span>'+text+'</span></div><div class="preview"><div class="kicker">Antes de salvar</div><span>Campos obrigatórios sinalizados com *</span><span>Erros aparecem junto ao campo.</span><span>O resumo acompanha o preenchimento.</span></div></aside>';
+const tabs=items=>'<div class="tabs">'+items.map((v,i)=>'<button type="button" class="btn" aria-current="'+(i===0)+'">'+String(i+1).padStart(2,'0')+' · '+v+'</button>').join('')+'</div>';
+let content='',crumb='';
+if(view==='person'){
+crumb='Pessoas e entidades / Nova pessoa';
+content='<h1>Nova <mark>pessoa.</mark></h1><p class="lead">Uma identidade cadastral, com os dados específicos de cada natureza.</p>'+tabs(['Identificação','Endereços','Contatos','Conferência'])+
+'<div class="body"><div>'+section('Natureza','Escolha o tipo antes de preencher o cadastro.',field('Tipo de pessoa *','',['Pessoa jurídica','Pessoa física']))+
+section('Identificação','Registro no formato informado, sem normalização.',field('Nome de exibição *','Atlas Capital')+field('Razão social *','Atlas Capital Management LLC')+field('País de registro *','',['Estados Unidos','Brasil'])+field('Número de registro *','98-1234567')+field('País de constituição *','',['Estados Unidos','Brasil'])+field('Nome fantasia','Atlas Capital')+field('Setor','Gestão de recursos'))+
+section('Observações','Informações complementares da entidade.',field('Observações',''))+'</div>'+aside('Atlas Capital','Pessoa jurídica · Estados Unidos')+'</div>';
+}else if(view==='asset'){
+crumb='Ativos / Novo ativo';
+content='<h1>Novo <mark>ativo.</mark></h1><p class="lead">Identifique o ativo, escolha sua família e vincule os cadastros relacionados.</p>'+tabs(['Identificação','Detalhes da família','Identificadores e listagens','Conferência'])+
+'<div class="body"><div>'+section('Família','Os detalhes mudam conforme a família escolhida.',field('Família do ativo *','',['Dívida','Renda variável','Fundo','Caixa','Genérico']))+
+section('Identificação','Dados comuns às cinco famílias.',field('Nome *','US Treasury 4.25% 2034')+field('Nome curto *','UST 4.25 2034')+field('Moeda *','',['USD · US Dollar','BRL · Real'])+field('Mercado *','',['Balcão','Listado','Privado','Não aplicável'])+field('Emissor','',['US Treasury','Selecionar entidade'])+field('País de risco','',['Estados Unidos','Brasil']))+
+section('Detalhes de dívida','Exemplo da segunda etapa. Accrual fixo em 252 dias úteis.',field('Instrumento *','',['Bond','Note'])+field('Tipo de dívida *','',['Soberana','Corporativa'])+field('Emissão','2024-11-15')+field('Vencimento','2034-11-15')+field('Tipo de cupom *','',['Fixo','Flutuante','Sem cupom'])+field('Taxa do cupom','4,25'))+'</div>'+aside('UST 4.25 2034','Dívida · USD · Balcão')+'</div>';
+}else if(view==='catalog'){
+const title=params.get('catalog')||'Moedas';crumb='Cadastros / '+title;
+content='<h1>Cadastro de <mark>'+title.toLowerCase()+'.</mark></h1><p class="lead">Consulta e manutenção dos cadastros utilizados por pessoas e ativos.</p><div class="toolbar">'+field('Buscar por código ou nome','')+'<button class="btn primary">Novo registro</button></div><p class="notice">A proposta usa o mesmo padrão de lista e formulário para os cadastros auxiliares.</p>';
+}else{
+crumb='Ativos / Cadastro';
+content='<h1>Seus <mark>ativos.</mark></h1><p class="lead">Identidade, detalhes e vínculos dos ativos offshore em um único lugar.</p><div class="toolbar"><input aria-label="Buscar ativo" class="in" placeholder="Buscar por nome, ISIN ou ticker"><select class="in" aria-label="Filtrar família"><option>Todas as famílias</option><option>Dívida</option><option>Renda variável</option><option>Fundo</option><option>Caixa</option><option>Genérico</option></select><a class="btn primary" href="?view=asset">Novo ativo</a></div><div class="table-wrap"><table><thead><tr><th>Ativo / identificador</th><th>Família</th><th>Moeda</th><th>Mercado</th><th>Situação</th><th>Ação</th></tr></thead><tbody>'+
+[['US Treasury 4.25% 2034','US91282CLW90','Dívida','USD','Balcão'],['Apple Inc.','US0378331005 · AAPL','Renda variável','USD','Listado'],['USD · Caixa','USD','Caixa','USD','Não aplicável']].map(row=>'<tr><td>'+row[0]+'<br><small>'+row[1]+'</small></td><td>'+row[2]+'</td><td>'+row[3]+'</td><td>'+row[4]+'</td><td><span class="tag">Ativo</span></td><td><a href="?view=asset">Abrir cadastro →</a></td></tr>').join('')+'</tbody></table></div><small>3 registros ilustrativos · a lista real terá paginação e filtros no servidor.</small>';
+}
+document.getElementById('content').innerHTML=content;document.getElementById('crumb').textContent=crumb;
+document.querySelector('[data-nav="'+view+'"]')?.classList.add('on');
+document.getElementById('primary').onclick=()=>alert('Prévia visual: o cadastro será gravado pela slice após a aprovação da proposta.');
+document.querySelectorAll('.tabs button').forEach(button=>button.onclick=()=>{document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-current','false'));button.setAttribute('aria-current','true')});
+</script></body></html>

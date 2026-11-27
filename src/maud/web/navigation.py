@@ -24,6 +24,31 @@ class MenuGroup:
 MENU = (
     MenuGroup("Carteira", (MenuItem("Painel", "dashboard"),)),
     MenuGroup(
+        "Pessoas e entidades",
+        (
+            MenuItem("Moedas", "entities_currencies_list", "entities.view_currency"),
+            MenuItem("Países", "entities_countries_list", "entities.view_country"),
+            MenuItem("Pessoas físicas e jurídicas", "entities_people_list", "entities.view_entity"),
+            MenuItem("Endereços", "entities_addresses_list", "entities.view_entityaddress"),
+            MenuItem("Contatos", "entities_contacts_list", "entities.view_entitycontact"),
+        ),
+    ),
+    MenuGroup(
+        "Ativos",
+        (
+            MenuItem("Cadastro de ativos", "assets_assets_list", "assets.view_asset"),
+            MenuItem("Casas de negociação", "assets_venues_list", "assets.view_tradingvenue"),
+            MenuItem("Identificadores", "assets_identifiers_list", "assets.view_assetidentifier"),
+            MenuItem("Listagens", "assets_listings_list", "assets.view_assetlisting"),
+            MenuItem(
+                "Classificações", "assets_classifications_list", "assets.view_assetclassification"
+            ),
+            MenuItem("Fontes de preço", "assets_sources_list", "assets.view_pricesource"),
+            MenuItem("Preços", "assets_prices_list", "assets.view_assetprice"),
+            MenuItem("Eventos de mercado", "assets_events_list", "assets.view_assetevent"),
+        ),
+    ),
+    MenuGroup(
         "Administração",
         (MenuItem("Personalização", "branding_settings", "branding.change_branding"),),
     ),
@@ -42,10 +67,16 @@ class VisibleGroup:
     label: str
     items: tuple[VisibleItem, ...]
 
+    @property
+    def active(self) -> bool:
+        return any(item.active for item in self.items)
+
 
 def menu_for(request: HttpRequest) -> tuple[VisibleGroup, ...]:
     user = request.user
     current = request.resolver_match.url_name if request.resolver_match else None
+    if current and current.endswith(("_new", "_edit")):
+        current = current.rsplit("_", 1)[0] + "_list"
     groups = []
     for group in MENU:
         items = tuple(

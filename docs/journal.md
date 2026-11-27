@@ -15,6 +15,35 @@ Modelo:
 
 ---
 
+## 2026-11-27 · web · grupos do menu recolhíveis
+- **O que mudou:** grupos do menu abrem e fecham independentemente, com indicador,
+  suporte nativo a teclado e preferência salva no navegador por usuário.
+  O grupo da tela atual abre automaticamente ao navegar.
+- **Por quê:** reduzir a altura do menu e facilitar a navegação entre cadastros.
+- **Pendente / atenção:** nenhuma alteração de permissão, model ou migration.
+- **Autor:** Felipe Linhares + Codex
+
+## 2026-11-27 · entities · cadastro conjunto com vínculos opcionais
+- **O que mudou:** casas decimais sai do formulário de moeda (default 2); setor de PJ
+  vira lista fechada dos 12 setores acordados. Pessoa física/jurídica permite adicionar,
+  editar e remover endereços e contatos na mesma tela, com gravação atômica.
+- **Por quê:** simplificar o cadastro sem obrigar o preenchimento de endereço/contato.
+  Item vazio é ignorado; item iniciado deve ter os campos necessários válidos.
+- **Pendente / atenção:** sem alteração de models/migrations. Permissões dos vínculos
+  continuam sendo conferidas; exclusão inline exige permissão de exclusão do item.
+- **Autor:** Felipe Linhares + Codex
+
+## 2026-11-27 · entities, assets · telas de cadastro e listas independentes
+- **O que mudou:** listagem, criação e edição para moedas, países, pessoas, endereços,
+  contatos, ativos das cinco famílias, casas, fontes, identificadores, listagens,
+  classificações, preços e eventos. Salvar/cancelar retorna à lista do próprio cadastro.
+- **Por quê:** disponibilizar os models já acordados pela operação, com navegação
+  inspirada no MCore e padrão visual white label do Glina; protótipo aprovado no chat.
+- **Pendente / atenção:** sem alteração de models nem migrations. Banco local precisa
+  estar preparado pelo humano conforme ADR 0009. Revisar a nova fachada de consultas
+  de entities e as permissões por cadastro com o time. Cadastros não publicam fatos externos.
+- **Autor:** Felipe Linhares + Codex
+
 ## 2026-11-27 · projeto, web, branding · portas no .env, logotipo maior, nome opcional
 - **O que mudou:** o `docker-compose.yml` não tem mais porta escrita: Postgres e API escutam nas portas do `.env` (`POSTGRES_PORT`, `API_PORT`), iguais dentro e fora do container; usuário, senha e banco também vêm do `.env`. API passou para a porta 8080. O banco só aceita conexão da própria máquina. Na tela: logotipo na proporção da imagem (56px de altura), destaque do título sem invadir a linha de cima, nome da gestora opcional (só o logotipo, ou o nome padrão se também não houver logotipo).
 - **Por quê:** vai rodar na máquina que já tem mcore (5433) e fidccopobras (5431); ajustes pedidos pelo Walter ao ver as telas rodando.

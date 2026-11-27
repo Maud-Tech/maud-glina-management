@@ -3,7 +3,12 @@
 > Como as telas são feitas e como devem parecer. Decisão em [ADR 0010](adr/0010-web-screens-white-label.md).
 > Protótipos de referência (abra no navegador): cadastro [`ui/asset-form.html`](ui/asset-form.html) e painel [`ui/dashboard.html`](ui/dashboard.html). As imagens (`*-dark.png`, `*-light.png`) ficam ao lado.
 
-**Situação:** a casca existe (`src/maud/web/`: layout, menu, entrar, painel, tema) e a Personalização também (módulo `branding`). As telas de cadastro entram com as slices de `entities` e `assets`.
+**Situação:** a casca, a Personalização e os cadastros de `entities` e `assets` existem.
+Cada cadastro separa listagem de formulário: Novo abre a criação; Abrir cadastro exibe
+o detalhe/edição; salvar, cancelar e voltar apontam para a lista do respectivo cadastro.
+Listas têm busca, filtros e paginação. Endereços/contatos e vínculos de ativos também
+são acessíveis no detalhe do registro pai. Consulta exige `view`, criação `add`,
+edição `change`; quem só consulta abre o formulário desabilitado.
 
 ## 1. O que é
 
@@ -72,6 +77,11 @@ A gestora escolhe **uma cor** (`--brand`). Tudo o mais é fixo ou derivado dela 
 | Barra de ações | Rodapé fixo: etapa à esquerda; Cancelar, Voltar e o botão principal à direita |
 
 ## 6. Formulário de cadastro
+
+Os grupos do menu lateral são expansíveis/recolhíveis por clique ou teclado
+(`details/summary`). A preferência fica no navegador por usuário e por grupo.
+Ao navegar, o grupo da tela atual abre automaticamente. Sem JavaScript ou storage,
+o controle nativo continua disponível; as permissões seguem sendo conferidas no servidor.
 
 - **Uma etapa por grupo de dados.** Cadastro curto cabe numa tela só, sem etapas.
 - **Conferência ao vivo:** a regra do `domain/` roda enquanto a pessoa preenche (htmx) e o erro aparece no campo. A slice confere de novo ao salvar.
